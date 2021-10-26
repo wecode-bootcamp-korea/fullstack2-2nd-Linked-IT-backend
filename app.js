@@ -15,14 +15,16 @@ app.get('/ping', (req, res) => {
   res.json('pong');
 });
 
-app.use('*', (req, res, next) => {
-  next(new Error(`NOT_FOUND`));
+app.use((req, res, next) => {
+  next(new Error(`NOT_FOUND_${req.originalUrl}`));
 });
 
 app.use((err, req, res, next) => {
-  console.log('app.js error handler', err);
-  const { status, message } = err;
-  res.send(status || 500).json(message);
+  if (err) {
+    console.error('global error handler', err);
+    const { status, message } = err;
+    res.send(status || 500).json(message);
+  }
 });
 
 export default app;

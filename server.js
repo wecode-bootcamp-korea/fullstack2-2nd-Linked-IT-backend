@@ -8,6 +8,6 @@ app.listen(PORT, (err) => {
   if (!err) {
     console.log(`Server is running ${PORT}`);
   } else {
-    console.log(err);
+    console.error(err);
   }
 });
