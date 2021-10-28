@@ -22,19 +22,19 @@ model User {
   updatedAt DateTime @map("updated_at")
   isDeleted Boolean  @default(false) @map("is_deleted")
 
-  Education              Education[]
-  ContactInformation     ContactInformation[]
+  Education              Education?
+  ContactInformation     ContactInformation?
   PositionCareer         PositionCareer[]
-  employmentAnnouncement EmploymentAnnouncement[]
+  employmentAnnouncement EmploymentAnnouncement?
   Post                   Post[]
-  UserImage              UserImage[]
+  UserImage              UserImage?
   application            application[]
   PostLike               PostLike[]
   Comment                Comment[]
   commentLike            commentLike[]
   Position               Position[]
-  Introduction           Introduction[]
-  RecruitmentUser        RecruitmentUser[]
+  Introduction           Introduction?
+  RecruitmentUser        RecruitmentUser?
 
   follow    Follow[] @relation("follower")
   following Follow[] @relation("following")
@@ -48,28 +48,14 @@ model User {
 model ScopeOfPublic {
   id Int @id @default(autoincrement())
 
-  publicStatus   PublicStatus @relation(fields: [publicStatusId], references: [id])
-  publicStatusId Int          @map("public_status_id")
-
-  ContactInformation ContactInformation[]
-  PositionCareer     PositionCareer[]
-  Education          Education[]
-  Post               Post[]
+  ContactInformation ContactInformation?
+  PositionCareer     PositionCareer?
+  Education          Education?
 
   scopeOfComment Post? @relation("scope_of_comment")
   scopeOfPost    Post? @relation("scope_of_post")
 
   @@map("scope_of_publics")
-}
-
-model PublicStatus {
-  id      Int     @id @default(autoincrement())
-  private Boolean @default(false)
-  friend  Boolean @default(true)
-  allUser Boolean @default(false) @map("all_user")
-
-  ScopeOfPublic ScopeOfPublic[]
-  @@map("relate_status")
 }
 
 model Introduction {
@@ -82,7 +68,7 @@ model Introduction {
   country          Country        @relation(fields: [countryId], references: [id])
   countryId        Int            @map("country_id")
   user             User           @relation(fields: [userId], references: [id])
-  userId           Int            @map("user_id")
+  userId           Int            @unique @map("user_id")
 
   @@map("introductions")
 }
@@ -131,9 +117,9 @@ model ContactInformation {
   birthDay    Int    @map("birth_day")
 
   user                            User          @relation(fields: [userId], references: [id])
-  userId                          Int           @map("user_id")
+  userId                          Int           @unique @map("user_id")
   contactInformationScopePublic   ScopeOfPublic @relation(fields: [contactInformationScopePublicId], references: [id])
-  contactInformationScopePublicId Int           @map("contact_information_scope_public_id")
+  contactInformationScopePublicId Int           @unique @map("contact_information_scope_public_id")
 
   InstantMessenger InstantMessenger[]
   Website          Website[]
@@ -156,7 +142,7 @@ model Degree {
   id   Int    @id @default(autoincrement())
   type String @db.VarChar(50)
 
-  CollegeDegree CollegeDegree[]
+  Education Education[]
 
   @@map("degrees")
 }
@@ -192,7 +178,7 @@ model PositionCareer {
   EmploymentType              EmploymentType @relation(fields: [employmentTypeId], references: [id])
   employmentTypeId            Int            @map("employment_type_id")
   positionCareerScopePublic   ScopeOfPublic  @relation(fields: [positionCareerScopePublicId], references: [id])
-  positionCareerScopePublicId Int            @map("position_career_scope_public_id")
+  positionCareerScopePublicId Int            @unique @map("position_career_scope_public_id")
 
   Introduction Introduction[]
 
@@ -203,10 +189,8 @@ model Position {
   id              Int    @id @default(autoincrement())
   currentPosition String @map("current_position") @db.VarChar(30)
 
-  user       User     @relation(fields: [userId], references: [id])
-  userId     Int      @map("user_id")
-  industry   Industry @relation(fields: [industryId], references: [id])
-  industryId Int      @map("industry_id")
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @map("user_id")
 
   PositionCareer PositionCareer[]
 
@@ -217,7 +201,8 @@ model Major {
   id   Int    @id @default(autoincrement())
   name String @db.VarChar(50)
 
-  CollegeMajor CollegeMajor[]
+  Education Education[]
+
   @@map("majors")
 }
 
@@ -227,21 +212,8 @@ model Industry {
 
   PositionCareer PositionCareer[]
   Company        Company[]
-  Position       Position[]
 
   @@map("industries")
-}
-
-model CollegeMajor {
-  id Int @id @default(autoincrement())
-
-  college   College @relation(fields: [collegeId], references: [id])
-  collegeId Int     @map("college_id")
-  major     Major   @relation(fields: [majorId], references: [id])
-  majorId   Int     @map("major_id")
-
-  CollegeDegreeMajor CollegeDegreeMajor[]
-  @@map("college_majors")
 }
 
 model Education {
@@ -254,12 +226,16 @@ model Education {
   activity        String @db.VarChar(30)
   description     String @db.VarChar(200)
 
-  collegeDegreeMajor       CollegeDegreeMajor @relation(fields: [collegeDegreeMajorId], references: [in])
-  collegeDegreeMajorId     Int                @map("college_degree_major")
-  user                     User               @relation(fields: [userId], references: [id])
-  userId                   Int                @map("user_id")
-  educationScopeOfPublic   ScopeOfPublic      @relation(fields: [educationScopeOfPublicId], references: [id])
-  educationScopeOfPublicId Int                @map("education_scope_of_public_id")
+  college                  College       @relation(fields: [collegeId], references: [id])
+  collegeId                Int           @map("college_id")
+  degree                   Degree        @relation(fields: [degreeId], references: [id])
+  degreeId                 Int           @map("degree_id")
+  major                    Major         @relation(fields: [majorId], references: [id])
+  majorId                  Int           @map("major_id")
+  user                     User          @relation(fields: [userId], references: [id])
+  userId                   Int           @unique @map("user_id")
+  educationScopeOfPublic   ScopeOfPublic @relation(fields: [educationScopeOfPublicId], references: [id])
+  educationScopeOfPublicId Int           @unique @map("education_scope_of_public_id")
 
   @@map("educations")
 }
@@ -270,9 +246,7 @@ model UserImage {
   userBackgroundUrl String @map("user_background_url") @db.VarChar(2000)
 
   user   User @relation(fields: [userId], references: [id])
-  userId Int  @map("user_id")
-  post   Post @relation(fields: [postId], references: [id])
-  postId Int  @map("post_id")
+  userId Int  @unique @map("user_id")
 
   @@map("user_iamges")
 }
@@ -291,8 +265,8 @@ model College {
   name     String @db.VarChar(50)
   location String @db.VarChar(100)
 
-  CollegeDegree CollegeDegree[]
-  CollegeMajor  CollegeMajor[]
+  Education Education[]
+
   @@map("colleges")
 }
 
@@ -304,18 +278,6 @@ model EmploymentType {
   employmentAnnouncement EmploymentAnnouncement[]
 
   @@map("employment_types")
-}
-
-model CollegeDegree {
-  id Int @id @default(autoincrement())
-
-  college   College @relation(fields: [collegeId], references: [id])
-  collegeId Int     @map("college_id")
-  degree    Degree  @relation(fields: [degreeId], references: [id])
-  degreeId  Int     @map("degree_id")
-
-  CollegeDegreeMajor CollegeDegreeMajor[]
-  @@map("college_degrees")
 }
 
 model EmploymentAnnouncement {
@@ -331,7 +293,7 @@ model EmploymentAnnouncement {
   workType         WorkType       @relation(fields: [workTypeId], references: [id])
   workTypeId       Int            @map("work_type_id")
   user             User           @relation(fields: [userId], references: [id])
-  userId           Int            @map("user_id")
+  userId           Int            @unique @map("user_id")
 
   CompanyImage CompanyImage[]
   application  application[]
@@ -357,18 +319,6 @@ model PostHashtag {
   hashtagId Int     @map("hashtag_id")
 
   @@map("posts_hashtags")
-}
-
-model CollegeDegreeMajor {
-  in Int @id @default(autoincrement())
-
-  collegeDegree   CollegeDegree @relation(fields: [collegeDegreeId], references: [id])
-  collegeDegreeId Int           @map("college_deggree_id")
-  collegeMajor    CollegeMajor  @relation(fields: [collegeMajorId], references: [id])
-  collegeMajorId  Int           @map("college_major_id")
-
-  Education Education[]
-  @@map("college_deegree_majors")
 }
 
 model CompanyImage {
@@ -399,7 +349,7 @@ model RecruitmentUser {
   id Int @id @default(autoincrement())
 
   user   User @relation(fields: [userId], references: [id])
-  userId Int  @map("user_id")
+  userId Int  @unique @map("user_id")
 
   @@map("recruitment_users")
 }
@@ -413,23 +363,19 @@ model Post {
   isDeleted Boolean  @map("is_deleted")
   likeCount Int      @map("like_count")
 
-  commentScopeOfPublic   ScopeOfPublic @relation("scope_of_comment", fields: [commentScopeOfPublicId], references: [id])
-  commentScopeOfPublicId Int           @unique @map("comment_scope_of_public_id")
-  postScopeOfPublic      ScopeOfPublic @relation("scope_of_post", fields: [postScopeOfPublicId], references: [id])
-  postScopeOfPublicId    Int           @unique @map("post_scope_of_public_id")
-  user                   User          @relation(fields: [userId], references: [id])
-  userId                 Int           @map("user_id")
-  postImage              PostImage     @relation(fields: [postImageId], references: [id])
-  postImageId            Int           @map("post_image_id")
+  commentScopeOfPublic   ScopeOfPublic  @relation("scope_of_comment", fields: [commentScopeOfPublicId], references: [id])
+  commentScopeOfPublicId Int            @unique @map("comment_scope_of_public_id")
+  postScopeOfPublic      ScopeOfPublic  @relation("scope_of_post", fields: [postScopeOfPublicId], references: [id])
+  postScopeOfPublicId    Int            @unique @map("post_scope_of_public_id")
+  user                   User           @relation(fields: [userId], references: [id])
+  userId                 Int            @map("user_id")
+  postAttachment         PostAttachment @relation(fields: [postAttachmentId], references: [id])
+  postAttachmentId       Int            @map("post_image_id")
 
-  PostHashtag   PostHashtag[]
-  UserImage     UserImage[]
-  PostLike      PostLike[]
-  PostLikeCount PostLikeCount[]
-  Comment       Comment[]
+  PostHashtag PostHashtag[]
+  PostLike    PostLike[]
+  Comment     Comment[]
 
-  ScopeOfPublic   ScopeOfPublic? @relation(fields: [scopeOfPublicId], references: [id])
-  scopeOfPublicId Int?
   @@map("posts")
 }
 
@@ -447,6 +393,7 @@ model Company {
 
   CompanyImage   CompanyImage[]
   PositionCareer PositionCareer[]
+
   @@map("companies")
 }
 
@@ -457,16 +404,6 @@ model Hashtag {
   PostHashtag PostHashtag[]
 
   @@map("hashtags")
-}
-
-model PostLikeCount {
-  id        Int @id @default(autoincrement())
-  likeCount Int @map("like_count")
-
-  post   Post @relation(fields: [postId], references: [id])
-  postId Int  @map("post_id")
-
-  @@map("post_like_counts")
 }
 
 model Friend {
@@ -525,14 +462,15 @@ model Follow {
   @@map("follows")
 }
 
-model PostImage {
-  id       Int    @id @default(autoincrement())
-  imageUrl String @map("image_url") @db.VarChar(2000)
-  order    Int
+model PostAttachment {
+  id         Int   @id @default(autoincrement())
+  image      Bytes @map("image_url") @db.ByteA
+  media      Bytes @db.ByteA
+  imageOrder Int   @map("image_order")
 
   Post Post[]
 
-  @@map("post_images")
+  @@map("post_attachments")
 }
 
 model PostLike {
