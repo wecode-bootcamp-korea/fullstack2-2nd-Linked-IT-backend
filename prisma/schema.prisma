@@ -25,13 +25,13 @@ model User {
   Education              Education?
   ContactInformation     ContactInformation?
   PositionCareer         PositionCareer[]
-  employmentAnnouncement EmploymentAnnouncement?
+  EmploymentAnnouncement EmploymentAnnouncement?
   Post                   Post[]
   UserImage              UserImage?
-  application            Application[]
+  Application            Application[]
   PostLike               PostLike[]
   Comment                Comment[]
-  commentLike            CommentLike[]
+  CommentLike            CommentLike[]
   Position               Position[]
   Introduction           Introduction?
   RecruitmentUser        RecruitmentUser?
@@ -39,7 +39,7 @@ model User {
   follow    Follow[] @relation("follower")
   following Follow[] @relation("following")
   user      Friend[] @relation("user")
-  friend    Friend[] @relation("friends")
+  friend    Friend[] @relation("friend")
 
 
   @@map("users")
@@ -182,7 +182,7 @@ model PositionCareer {
 
   Introduction Introduction[]
 
-  @@map("position_career")
+  @@map("position_careers")
 }
 
 model Position {
@@ -248,7 +248,7 @@ model UserImage {
   user   User @relation(fields: [userId], references: [id])
   userId Int  @unique @map("user_id")
 
-  @@map("user_iamges")
+  @@map("user_images")
 }
 
 model Application {
@@ -411,7 +411,7 @@ model Hashtag {
 model Friend {
   user            User          @relation("user", fields: [userId], references: [id])
   userId          Int           @map("user_id")
-  friend          User          @relation("friends", fields: [friendId], references: [id])
+  friend          User          @relation("friend", fields: [friendId], references: [id])
   friendId        Int           @map("friend_id")
   friendsStatus   FriendsStatus @relation(fields: [friendsStatusId], references: [id])
   friendsStatusId Int           @map("friends_status_id")
@@ -479,7 +479,7 @@ model PostLike {
   id Int @id @default(autoincrement())
 
   postLikeStyle   PostLikeStyle @relation(fields: [postLikeStyleId], references: [id])
-  postLikeStyleId Int           @unique @map("post_Like_style_id")
+  postLikeStyleId Int           @unique @map("post_like_style_id")
   user            User          @relation(fields: [userId], references: [id])
   userId          Int           @map("user_id")
   post            Post          @relation(fields: [postId], references: [id])
