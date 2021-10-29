@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -439,7 +439,7 @@ model Comment {
   likeCount Int      @map("like_count")
 
 
-  comment   Comment @relation("selfRelationComment", fields: [commentId], references: [id]) // 셀프참조
+  comment   Comment @relation("selfRelationComment", fields: [commentId], references: [id])
   commentId Int     @map("comment_id")
   user      User    @relation(fields: [userId], references: [id])
   userId    Int     @map("user_id")
@@ -463,10 +463,10 @@ model Follow {
 }
 
 model PostAttachment {
-  id         Int   @id @default(autoincrement())
-  image      Bytes @map("image_url") @db.ByteA
-  media      Bytes @db.ByteA
-  imageOrder Int   @map("image_order")
+  id         Int    @id @default(autoincrement())
+  imageUrl   String @map("image_url") @db.VarChar(2000)
+  media      Bytes  @db.Blob
+  imageOrder Int    @map("image_order")
 
   Post Post[]
 
@@ -490,8 +490,7 @@ model PostLikeStyle {
   id    Int    @id @default(autoincrement())
   style String @db.VarChar(30)
 
-
-  PostLike PostLike?
+  postLike PostLike?
 
   @@map("post_like_styles")
 }
