@@ -474,14 +474,24 @@ model PostAttachment {
 }
 
 model PostLike {
-  id      Int     @id @default(autoincrement())
-  style   String  @db.VarChar(30)
-  isLiked Boolean @default(false) @map("is_liked")
+  id Int @id @default(autoincrement())
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int  @map("user_id")
-  post   Post @relation(fields: [postId], references: [id])
-  postId Int  @map("post_id")
+  postLikeStyle PostLikeStyle @relation(fields: [postStyleId], references: [id])
+  postStyleId   Int           @unique @map("post_like_id")
+  user          User          @relation(fields: [userId], references: [id])
+  userId        Int           @map("user_id")
+  post          Post          @relation(fields: [postId], references: [id])
+  postId        Int           @map("post_id")
 
   @@map("posts_likes")
+}
+
+model PostLikeStyle {
+  id    Int    @id @default(autoincrement())
+  style String @db.VarChar(30)
+
+
+  PostLike PostLike?
+
+  @@map("post_like_styles")
 }
