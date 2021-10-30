@@ -31,25 +31,33 @@ model User {
   PostLike               PostLike[]
   Comment                Comment[]
   CommentLike            CommentLike[]
-  Position               Position[]
 
-  follow    Follow[] @relation("follower")
-  following Follow[] @relation("following")
-  user      Friend[] @relation("user")
-  friend    Friend[] @relation("friend")
 
+  follow       Follow[]       @relation("follower")
+  following    Follow[]       @relation("following")
+  user         Friend[]       @relation("user")
+  friend       Friend[]       @relation("friend")
+  // M:N관계인 User_position 컬럼 추가
+  UserPosition UserPosition[]
 
   @@map("users")
+}
+
+// user와 position 테이블 사이 N:M 중간 테이블인 User_position 추가
+model UserPosition {
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int      @map("user_id")
+  position   Position @relation(fields: [positionId], references: [id])
+  positionId Int      @map("position_id")
+
+  @@map("user_positions")
 }
 
 enum ScopeOfPublic {
   ANYONE
   CONNECTINOS
   NOONE
-
-
-
-
 
   @@map("scope_of_publics")
 }
@@ -231,10 +239,11 @@ model Position {
   id           Int    @id @default(autoincrement())
   positionName String @map("position_name") @db.VarChar(30)
 
-
-  user   User @relation(fields: [userId], references: [id])
-  userId Int  @map("user_id")
-
+  // N:M 관계 추가하기 위해 1:N 관계
+  // user   User? @relation(fields: [userId], references: [id])
+  // userId Int?  @map("user_id")
+  UserPosition   UserPosition[]
+  // M:N관계인 User_position 컬럼 추가
   PositionCareer PositionCareer[]
 
   @@map("positions")
@@ -290,6 +299,7 @@ model EmploymentAnnouncement {
   createdAt         DateTime @default(now()) @map("created_at")
   numberOfApplicant Int      @map("number_of_applicant")
   isEasyApply       Boolean  @default(false) @map("is_easy_apply")
+  // ~전 표시해주기 위한 timeSincePosted 컬럼 추가
   timeSincePosted   String?  @map("time_since_posted")
 
   employmentType   EmploymentType @relation(fields: [employmentTypeId], references: [id])
