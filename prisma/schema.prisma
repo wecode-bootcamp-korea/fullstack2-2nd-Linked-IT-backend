@@ -290,7 +290,7 @@ model EmploymentAnnouncement {
   createdAt         DateTime @default(now()) @map("created_at")
   numberOfApplicant Int      @map("number_of_applicant")
   isEasyApply       Boolean  @default(false) @map("is_easy_apply")
-
+  timeSincePosted   String?  @map("time_since_posted")
 
   employmentType   EmploymentType @relation(fields: [employmentTypeId], references: [id])
   employmentTypeId Int            @map("employment_type_id")
