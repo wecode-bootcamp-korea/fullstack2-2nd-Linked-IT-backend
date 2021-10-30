@@ -56,7 +56,7 @@ enum ScopeOfPublic {
 
 model Introduction {
   id             Int     @id @default(autoincrement())
-  anotherName    String? @map("another_name") @db.VarChar(50)
+  anotherName    String? @map("another_name") @db.VarChar(100)
   oneLineProfile String  @map("one_line_profile") @db.VarChar(200)
 
   position         PositionCareer @relation(fields: [positionCareerId], references: [id])
@@ -72,10 +72,11 @@ model Introduction {
 }
 
 model Country {
-  id           Int            @id @default(autoincrement())
-  countryName  String         @map("country_name") @db.VarChar(100)
-  sortNam      String         @map("sort_name") @db.VarChar(100)
-  phoneCode    String         @map("phone_code") @db.VarChar(100)
+  id          Int    @id @default(autoincrement())
+  countryName String @map("country_name") @db.VarChar(100)
+  sortName    String @map("sort_name") @db.VarChar(100)
+  phoneCode   String @map("phone_code") @db.VarChar(100)
+
   State        State[]
   Introduction Introduction[]
 
@@ -110,7 +111,6 @@ model ContactInformation {
   phoneNumber String? @map("phone_number") @db.VarChar(30)
   phoneType   Int?    @map("phone_type")
   address     String? @db.VarChar(100)
-  email       String? @db.VarChar(100)
   birthYear   Int?    @map("birth_year")
   birthMonth  Int?    @map("birth_month")
   birthDay    Int?    @map("birth_day")
@@ -118,7 +118,7 @@ model ContactInformation {
   user   User @relation(fields: [userId], references: [id])
   userId Int  @unique @map("user_id")
 
-  scopeOfPublic ScopeOfPublic @default(ANYONE)
+  scopeOfPublic ScopeOfPublic @default(ANYONE) @map("scope_of_public")
 
   InstantMessenger InstantMessenger[]
   Website          Website[]
@@ -166,14 +166,14 @@ model Education {
   majorId       Int           @map("major_id")
   user          User          @relation(fields: [userId], references: [id])
   userId        Int           @unique @map("user_id")
-  scopeOfPublic ScopeOfPublic @default(ANYONE)
+  scopeOfPublic ScopeOfPublic @default(ANYONE) @map("scope_of_public")
 
   @@map("educations")
 }
 
 model Degree {
-  id   Int    @id @default(autoincrement())
-  type String @db.VarChar(50)
+  id   Int     @id @default(autoincrement())
+  type String? @db.VarChar(50)
 
   Education Education[]
 
@@ -181,8 +181,8 @@ model Degree {
 }
 
 model Major {
-  id   Int    @id @default(autoincrement())
-  name String @db.VarChar(50)
+  id        Int    @id @default(autoincrement())
+  majorName String @map("major_name") @db.VarChar(50)
 
   Education Education[]
 
@@ -190,9 +190,9 @@ model Major {
 }
 
 model College {
-  id       Int    @id @default(autoincrement())
-  name     String @db.VarChar(50)
-  location String @db.VarChar(100)
+  id          Int    @id @default(autoincrement())
+  collegeName String @map("college_name") @db.VarChar(50)
+  location    String @db.VarChar(100)
 
   Education Education[]
 
@@ -203,11 +203,12 @@ model PositionCareer {
   id                   Int     @id @default(autoincrement())
   isCurrentPosition    Boolean @default(true) @map("is_current_position")
   isEndCurrentPosition Boolean @default(false) @map("is_end_current_position")
-
-  startDateAt DateTime @map("start_date_at")
-  endDateAt   DateTime @map("end_date_at")
-  headline    String   @db.VarChar(100)
-  description String?  @db.VarChar(2000)
+  startMonth           Int?    @map("start_month")
+  startYear            Int?    @map("start_year")
+  endMonth             Int?    @map("end_month")
+  endYear              Int?    @map("end_year")
+  headline             String  @db.VarChar(100)
+  description          String? @db.VarChar(2000)
 
   position         Position       @relation(fields: [positionId], references: [id])
   positionId       Int            @map("position_id")
@@ -220,7 +221,7 @@ model PositionCareer {
   EmploymentType   EmploymentType @relation(fields: [employmentTypeId], references: [id])
   employmentTypeId Int            @map("employment_type_id")
 
-  scopeOfPublic ScopeOfPublic @default(ANYONE)
+  scopeOfPublic ScopeOfPublic @default(ANYONE) @map("scope_of_public")
 
   Introduction Introduction[]
 
@@ -252,9 +253,9 @@ model Industry {
 }
 
 model UserImage {
-  id                Int    @id @default(autoincrement())
-  userProfileUrl    String @map("user_profile_url") @db.VarChar(2000)
-  userBackgroundUrl String @map("user_background_url") @db.VarChar(2000)
+  id                Int     @id @default(autoincrement())
+  userProfileUrl    String? @map("user_profile_url") @db.VarChar(2000)
+  userBackgroundUrl String? @map("user_background_url") @db.VarChar(2000)
 
   user   User @relation(fields: [userId], references: [id])
   userId Int  @unique @map("user_id")
@@ -325,9 +326,9 @@ model PostHashtag {
 }
 
 model CompanyImage {
-  id                   Int    @id @default(autoincrement())
-  companyProfileUrl    String @map("company_profile_url") @db.VarChar(2000)
-  companyBackgroundUrl String @map("company_background_url") @db.VarChar(2000)
+  id                   Int     @id @default(autoincrement())
+  companyProfileUrl    String? @map("company_profile_url") @db.VarChar(2000)
+  companyBackgroundUrl String? @map("company_background_url") @db.VarChar(2000)
 
   company                  Company                @relation(fields: [companyId], references: [id])
   companyId                Int                    @map("company_id")
@@ -365,8 +366,8 @@ model Post {
   deletedAt            DateTime?      @map("deleted_at")
   isDeleted            Boolean        @default(false) @map("is_deleted")
   likeCount            Int?           @map("like_count")
-  postScopeOfPublic    ScopeOfPublic  @default(ANYONE)
-  commnetScopeOfPublic ScopeOfPublic  @default(ANYONE)
+  postScopeOfPublic    ScopeOfPublic  @default(ANYONE) @map("post_scope_of_public")
+  commentScopeOfPublic ScopeOfPublic  @default(ANYONE) @map("comment_scope_of_public")
   user                 User           @relation(fields: [userId], references: [id])
   userId               Int            @map("user_id")
   postAttachment       PostAttachment @relation(fields: [postAttachmentId], references: [id])
