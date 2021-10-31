@@ -1,73 +1,110 @@
 import prisma from '../../prisma';
 
-const getProfile = async () => {
+const getProfile = async (userId) => {
   return await prisma.$queryRaw`
-  SELECT  u.frist_name                    AS user_first_name
-        , u.last_name                     AS user_last_name
-        , u.email                         AS user_email
-        , u.provider                      AS user_provider
-        , ci.profile_url                   AS user_profile_url
-        , ci.phone_number                 AS user_phone_number
-        , ci.phone_type                   AS user_phone_type
-        , ci.address                      AS user_address
-        , ci.email                        AS user_email
-        , ci.birth_year                   AS user_birth_year
-        , ci.birth_month                  AS user_birth_month
-        , ci.birth_day                    AS user_birth_day
-        , ui.user_profile_url
-        , ui.user_background_url
-        , countries.country_name
-        , cities.city_name
-        , states.state_name
-        , itr.industry_type
-        , itr.another_name
-        , itr.one_line_profile
-        , c.korean_name                   AS company_korean_name
-        , c.english_name                  AS company_english_name
-        , c.introduction                  AS company_introduction
-        , c.location                      AS company_location
-        , cimg.company_profile_url
-        , cimg.company_background_url
-        , p.current_position
-        , pc.is_working_as_position_now
-        , pc.is_ended_positon_now
-        , pc.start_date_at                AS position_start_date 
-        , pc.end_date_at                  AS position_end_date
-        , pc.headline                     AS position_headline
-        , pc.description                  AS position_description
-        , employment_types.type           AS employment_type
-        , work_types.type                 AS work_type
-        , degrees.type                    AS degree_type
-        , e.admission_month
-        , e.admission_year
-        , e.graduation_month
-        , e.graduation_year
-        , e.grade
-        , e.activity                      AS education_activity
-        , e.description                   AS education_description
-        , colleges.name                   AS college_name
-        , colleges.location               AS college_location
-        , majors.name                     AS major_name 
-  FROM    users u
-        , user_images ui
-        , contact_informations ci
-        , countries
-        , cities
-        , states
-        , introductions itr
-        , companies c
-        , company_images cimg
-        , position p
-        , position_careers pc
-        , employment_types
-        , work_types 
-        , industries i
-        , degrees
-        , educations e
-        , colleges
-        , majors
-  WHERE u.id = ${id}
-  `;
+      SELECT  u.first_name             firstName
+            , u.last_name             lastName
+            , u.email
+            , u.provider
+            , u.sns_id                snsId
+            , ui.user_profile_url      userProfileImageUrl
+            , ui.user_background_url  userBacgroundImageUrl
+            , cinfo.profile_url        profileUrl
+            , cinfo.phone_number      phoneNumber
+            , c.phone_code            phoneCode
+            , c.country_name          countryName
+            , c.sort_name             countrySortName
+            , states.state_name       stateName
+            , cities.city_name        cityName
+            , cinfo.phone_type        phoneType
+            , cinfo.address
+            , cinfo.birth_year        birthYear
+            , cinfo.birth_month       birthMonth
+            , cinfo.birth_day         birthDay
+            , cinfo.user_id           userId
+            , cinfo.scope_of_public   userScopeOfPublic
+        FROM  users u
+   LEFT JOIN  user_images ui
+          ON  u.id = ui.user_id
+   LEFT JOIN  contact_informations cinfo
+          ON  u.id = cinfo.user_id
+   LEFT JOIN  countries c
+          ON  u.id = c.id
+   LEFT JOIN  states
+          ON  c.id = states.country_id
+   LEFT JOIN  cities
+          ON  states.id = cities.state_id
+       WHERE  u.id = ${userId}
+       ;
+      `;
 };
 
-export default { getProfile };
+const getEducation = async (userId) => {
+  return await prisma.$queryRaw`
+    SELECT  u.id
+          , u.first_name         firstName
+          , u.last_name         lastName
+          , e.admission_month   admissionMonth
+          , e.admission_year    admissionYear
+          , e.graduation_month  graduationMonth
+          , e.graduation_year   graduationYear
+          , e.grade
+          , e.activity
+          , e.description
+          , c.college_name      collegeName
+          , c.location          collegeLocation
+          , d.type              degreeType
+          , m.major_name        majorName
+      FROM  educations e
+ LEFT JOIN  users u
+        ON  e.id = u.id
+ LEFT JOIN  colleges c
+        ON  e.id = c.id
+ LEFT JOIN  degrees d
+        ON  e.degree_id = d.id
+ LEFT JOIN  majors m
+        ON  e.major_id = m.id
+     WHERE  u.id = ${userId}
+     ;
+    `;
+};
+
+const getCareer = async (userId) => {
+  return await prisma.$queryRaw`
+      SELECT  u.id
+            , u.first_name                 firstName
+            , u.last_name                 lastName
+            , pc.is_current_position      isCurrentPosition
+            , pc.is_end_current_position  isEndCurrentPosition
+            , pc.headline                 careerHeadline
+            , pc.description              careerDescription
+            , pc.start_month              careerStartMonth
+            , pc.start_year               careerStartYear
+            , pc.end_month                careerEndMonth
+            , pc.end_year                 careerEndYear
+            , c.korean_name               companyKoreanName
+            , c.english_name              companyEnglishName
+            , c.location                  companyLocation
+            , ci.company_profile_url       companyProfileImageUrl
+            , i.industry_type             industryType
+            , p.position_name             positionName
+            , et.type                     employmentType
+        FROM  position_careers pc
+   LEFT JOIN  users u
+          ON  u.id = pc.user_id
+   LEFT JOIN  companies c
+          ON  c.id = pc.company_id
+   LEFT JOIN  company_images ci
+          ON  c.id = ci.company_id
+   LEFT JOIN  industries i
+          ON  pc.industry_id = i.id
+   LEFT JOIN  positions p
+          ON  u.id = p.user_id
+   LEFT JOIN  employment_types et
+          ON  pc.employment_type_id = et.id
+       WHERE  u.id = ${userId}
+       ;
+      `;
+};
+
+export default { getProfile, getEducation, getCareer };

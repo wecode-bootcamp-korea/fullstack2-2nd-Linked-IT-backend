@@ -1,7 +1,15 @@
 import { profileDao } from '../models';
 
-const getProfile = async (id) => {
-  return await profileDao.getProfile(id);
+const getProfile = async (userId) => {
+  return await profileDao.getProfile(userId);
 };
 
-export default { getProfile };
+const getEducation = async (userId) => {
+  return await profileDao.getEducation(userId);
+};
+
+const getCareer = async (userId) => {
+  return await profileDao.getCareer(userId);
+};
+
+export default { getProfile, getEducation, getCareer };
