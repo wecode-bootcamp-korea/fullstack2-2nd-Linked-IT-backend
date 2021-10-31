@@ -42,24 +42,42 @@ const InsertData = (fileName) => {
       //     companies (id, korean_name,english_name,introduction,location,number_of_employee, industry_id)
       //   VALUES
       //     (${data.id}, ${data.korean_name}, ${data.english_name}, ${data.introduction},${data.location},${data.number_of_employee},${data.industry_id});`;
-      // if (fileName === 'employment_announcements')
-      //   await prisma.$queryRaw`
-      //       INSERT INTO
-      //         employment_announcements (id, headline, content, created_at, number_of_applicant, is_easy_apply, employment_type_id, work_type_id, user_id, time_since_posted)
-      //       VALUES
-      //         (${data.id}, ${data.headline}, ${data.content}, ${data.created_at}, ${data.number_of_applicant}, ${data.is_easy_apply}, ${data.employment_type_id}, ${data.work_type_id}, ${data.user_id}, ${data.time_since_posted});`;
+      if (fileName === 'employment_announcements')
+        await prisma.$queryRaw`
+            INSERT INTO
+              employment_announcements (id, headline, content, created_at, number_of_applicant, is_easy_apply, employment_type_id, work_type_id, user_id, time_since_posted, salaryInformation)
+            VALUES
+              (${data.id}, ${data.headline}, ${data.content}, ${data.created_at}, ${data.number_of_applicant}, ${data.is_easy_apply}, ${data.employment_type_id}, ${data.work_type_id}, ${data.user_id}, ${data.time_since_posted}, ${salaryInformation});`;
       // if (fileName === 'company_images')
       //   await prisma.$queryRaw`
       //   INSERT INTO
       //     company_images (id,company_profile_url,company_background_url,company_id,employment_announcement_id)
       //   VALUES
       //     (${data.id}, ${data.company_profile_url}, ${data.company_background_url}, ${data.company_id},${data.employment_announcement_id});`;
-      if (fileName === 'positions')
+      // if (fileName === 'positions')
+      //   await prisma.$queryRaw`
+      //   INSERT INTO
+      //     positions (id, position_name)
+      //   VALUES
+      //     (${data.id}, ${data.position_name})`;
+      if (fileName === 'user_positions')
         await prisma.$queryRaw`
         INSERT INTO
-          positions (id, position_name)
+          user_positions (id, user_id, position_id)
         VALUES
-          (${data.id}, ${data.position_name})`;
+          (${data.id},${data.user_id}, ${data.position_id});`;
+      // if (fileName === 'applications')
+      //   await prisma.$queryRaw`
+      //   INSERT INTO
+      //     applications (id, user_id, employment_announcement_id)
+      //   VALUES
+      //     (${data.id},${data.user_id},${data.employment_announcement_id});`;
+      if (fileName === 'user_images')
+        await prisma.$queryRaw`
+        INSERT INTO
+          user_images (id, user_profile_url, user_background_url, user_id)
+        VALUES
+          (${data.id},${data.user_profile_url},${data.user_background_url}, ${data.user_id});`;
       try {
         csvData.push(data);
         await prisma.$queryRaw`
@@ -82,7 +100,10 @@ async function insertAllData() {
     // 'companies',
     // 'employment_announcements',
     // 'company_images',
-    'positions',
+    // 'positions',
+    'user_positions',
+    // 'applications',
+    'user_images',
   ];
 
   for await (let file of files) {
