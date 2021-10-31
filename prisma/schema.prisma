@@ -46,8 +46,8 @@ model User {
 // user와 position 테이블 사이 N:M 중간 테이블인 User_position 추가
 model UserPosition {
   id         Int      @id @default(autoincrement())
-  user       User     @relation(fields: [userId], references: [id])
-  userId     Int      @map("user_id")
+  user       User?    @relation(fields: [userId], references: [id])
+  userId     Int?     @map("user_id")
   position   Position @relation(fields: [positionId], references: [id])
   positionId Int      @map("position_id")
 
@@ -237,7 +237,7 @@ model PositionCareer {
 
 model Position {
   id           Int    @id @default(autoincrement())
-  positionName String @map("position_name") @db.VarChar(30)
+  positionName String @map("position_name") @db.VarChar(100)
 
   // N:M 관계 추가하기 위해 1:N 관계
   // user   User? @relation(fields: [userId], references: [id])
@@ -297,10 +297,12 @@ model EmploymentAnnouncement {
   headline          String   @db.VarChar(100)
   content           String   @db.MediumText
   createdAt         DateTime @default(now()) @map("created_at")
-  numberOfApplicant Int      @map("number_of_applicant")
+  // 지원 자 테이블, 중간 테이블을 기준으로  M:N 연결하여 numberOfApplicant 컬럼 삭제
   isEasyApply       Boolean  @default(false) @map("is_easy_apply")
   // ~전 표시해주기 위한 timeSincePosted 컬럼 추가
   timeSincePosted   String?  @map("time_since_posted")
+  // 연봉 정보 컬럼 삭제되어서 다시 추가
+  salaryInformation String?  @map("salary_information")
 
   employmentType   EmploymentType @relation(fields: [employmentTypeId], references: [id])
   employmentTypeId Int            @map("employment_type_id")
@@ -309,10 +311,23 @@ model EmploymentAnnouncement {
   user             User           @relation(fields: [userId], references: [id])
   userId           Int            @unique @map("user_id")
 
-  CompanyImage CompanyImage[]
-  application  Application[]
+  CompanyImage                      CompanyImage[]
+  Application                       Application[]
+  //EmploymentAnnouncementAttactment테이블과 1:N관계
+  EmploymentAnnouncementAttachments EmploymentAnnouncementAttachments[]
 
   @@map("employment_announcements")
+}
+
+// 회사 공고 이미지 첨부를 위한 테이블 EmploymentAnnouncementAttactments로 EmploymentAnnouncement와 N:1 관계
+model EmploymentAnnouncementAttachments {
+  id                             Int                    @id @default(autoincrement())
+  // 회사 공고 이미지 첨부를 위한 테이블 EmploymentAnnouncementAttactmentId 추가
+  employmentAnnouncement         EmploymentAnnouncement @relation(fields: [employmentAnnouncementId], references: [id])
+  employmentAnnouncementId       Int                    @map("employment_announcement_id")
+  employmentAnnouncementImageUrl String?                @map("employment_announcement_image_url")
+
+  @@map("employment_announcement_attachments")
 }
 
 model WorkType {
@@ -335,9 +350,9 @@ model PostHashtag {
 }
 
 model CompanyImage {
-  id                   Int    @id @default(autoincrement())
-  companyProfileUrl    String @map("company_profile_url") @db.VarChar(2000)
-  companyBackgroundUrl String @map("company_background_url") @db.VarChar(2000)
+  id                   Int     @id @default(autoincrement())
+  companyProfileUrl    String? @map("company_profile_url") @db.VarChar(2000)
+  companyBackgroundUrl String? @map("company_background_url") @db.VarChar(2000)
 
   company                  Company                @relation(fields: [companyId], references: [id])
   companyId                Int                    @map("company_id")
