@@ -33,13 +33,25 @@ model User {
   CommentLike            CommentLike[]
   Position               Position[]
 
-  follow    Follow[] @relation("follower")
-  following Follow[] @relation("following")
-  user      Friend[] @relation("user")
-  friend    Friend[] @relation("friend")
 
+  follow       Follow[]       @relation("follower")
+  following    Follow[]       @relation("following")
+  user         Friend[]       @relation("user")
+  friend       Friend[]       @relation("friend")
+  // M:N관계인 User_position 컬럼 추가
+  UserPosition UserPosition[]
 
   @@map("users")
+}
+
+model UserPosition {
+  id         Int      @id @default(autoincrement())
+  user       User?    @relation(fields: [userId], references: [id])
+  userId     Int?     @map("user_id")
+  position   Position @relation(fields: [positionId], references: [id])
+  positionId Int      @map("position_id")
+
+  @@map("user_positions")
 }
 
 enum ScopeOfPublic {
@@ -47,16 +59,12 @@ enum ScopeOfPublic {
   CONNECTINOS
   NOONE
 
-
-
-
-
   @@map("scope_of_publics")
 }
 
 model Introduction {
   id             Int     @id @default(autoincrement())
-  anotherName    String? @map("another_name") @db.VarChar(100)
+  anotherName    String? @map("another_name") @db.VarChar(50)
   oneLineProfile String  @map("one_line_profile") @db.VarChar(200)
 
   position         PositionCareer @relation(fields: [positionCareerId], references: [id])
@@ -72,11 +80,10 @@ model Introduction {
 }
 
 model Country {
-  id          Int    @id @default(autoincrement())
-  countryName String @map("country_name") @db.VarChar(100)
-  sortName    String @map("sort_name") @db.VarChar(100)
-  phoneCode   String @map("phone_code") @db.VarChar(100)
-
+  id           Int            @id @default(autoincrement())
+  countryName  String         @map("country_name") @db.VarChar(100)
+  sortNam      String         @map("sort_name") @db.VarChar(100)
+  phoneCode    String         @map("phone_code") @db.VarChar(100)
   State        State[]
   Introduction Introduction[]
 
@@ -111,6 +118,7 @@ model ContactInformation {
   phoneNumber String? @map("phone_number") @db.VarChar(30)
   phoneType   Int?    @map("phone_type")
   address     String? @db.VarChar(100)
+  email       String? @db.VarChar(100)
   birthYear   Int?    @map("birth_year")
   birthMonth  Int?    @map("birth_month")
   birthDay    Int?    @map("birth_day")
@@ -230,14 +238,17 @@ model PositionCareer {
 
 model Position {
   id           Int    @id @default(autoincrement())
-  positionName String @map("position_name") @db.VarChar(30)
+  positionName String @map("position_name") @db.VarChar(100)
 
-
-  user   User @relation(fields: [userId], references: [id])
-  userId Int  @map("user_id")
-
+  // N:M 관계 추가하기 위해 1:N 관계
+  // user   User? @relation(fields: [userId], references: [id])
+  // userId Int?  @map("user_id")
+  UserPosition   UserPosition[]
+  // M:N관계인 User_position 컬럼 추가
   PositionCareer PositionCareer[]
 
+  User   User? @relation(fields: [userId], references: [id])
+  userId Int?
   @@map("positions")
 }
 
@@ -289,9 +300,9 @@ model EmploymentAnnouncement {
   headline          String   @db.VarChar(100)
   content           String   @db.MediumText
   createdAt         DateTime @default(now()) @map("created_at")
-  numberOfApplicant Int      @map("number_of_applicant")
   isEasyApply       Boolean  @default(false) @map("is_easy_apply")
-
+  timeSincePosted   String?  @map("time_since_posted")
+  salaryInformation String?  @map("salary_information")
 
   employmentType   EmploymentType @relation(fields: [employmentTypeId], references: [id])
   employmentTypeId Int            @map("employment_type_id")
@@ -300,10 +311,20 @@ model EmploymentAnnouncement {
   user             User           @relation(fields: [userId], references: [id])
   userId           Int            @unique @map("user_id")
 
-  CompanyImage CompanyImage[]
-  application  Application[]
+  CompanyImage                      CompanyImage[]
+  Application                       Application[]
+  EmploymentAnnouncementAttachments EmploymentAnnouncementAttachments[]
 
   @@map("employment_announcements")
+}
+
+model EmploymentAnnouncementAttachments {
+  id                             Int                    @id @default(autoincrement())
+  employmentAnnouncement         EmploymentAnnouncement @relation(fields: [employmentAnnouncementId], references: [id])
+  employmentAnnouncementId       Int                    @map("employment_announcement_id")
+  employmentAnnouncementImageUrl String?                @map("employment_announcement_image_url")
+
+  @@map("employment_announcement_attachments")
 }
 
 model WorkType {
