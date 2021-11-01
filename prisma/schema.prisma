@@ -32,14 +32,12 @@ model User {
   Comment                Comment[]
   CommentLike            CommentLike[]
   Position               Position[]
+  UserPosition           UserPosition[]
 
-
-  follow       Follow[]       @relation("follower")
-  following    Follow[]       @relation("following")
-  user         Friend[]       @relation("user")
-  friend       Friend[]       @relation("friend")
-  // M:N관계인 User_position 컬럼 추가
-  UserPosition UserPosition[]
+  follow    Follow[] @relation("follower")
+  following Follow[] @relation("following")
+  user      Friend[] @relation("user")
+  friend    Friend[] @relation("friend")
 
   @@map("users")
 }
@@ -240,11 +238,7 @@ model Position {
   id           Int    @id @default(autoincrement())
   positionName String @map("position_name") @db.VarChar(100)
 
-  // N:M 관계 추가하기 위해 1:N 관계
-  // user   User? @relation(fields: [userId], references: [id])
-  // userId Int?  @map("user_id")
   UserPosition   UserPosition[]
-  // M:N관계인 User_position 컬럼 추가
   PositionCareer PositionCareer[]
 
   User   User? @relation(fields: [userId], references: [id])
@@ -428,18 +422,18 @@ model Hashtag {
 }
 
 model Friend {
-  user            User          @relation("user", fields: [userId], references: [id])
-  userId          Int           @map("user_id")
-  friend          User          @relation("friend", fields: [friendId], references: [id])
-  friendId        Int           @map("friend_id")
-  friendsStatus   FriendsStatus @relation(fields: [friendsStatusId], references: [id])
-  friendsStatusId Int           @map("friends_status_id")
+  user           User         @relation("user", fields: [userId], references: [id])
+  userId         Int          @map("user_id")
+  friend         User         @relation("friend", fields: [friendId], references: [id])
+  friendId       Int          @map("friend_id")
+  friendStatus   FriendStatus @relation(fields: [friendStatusId], references: [id])
+  friendStatusId Int          @map("friends_status_id")
 
   @@id([userId, friendId])
   @@map("friends")
 }
 
-model FriendsStatus {
+model FriendStatus {
   id   Int    @id @default(autoincrement())
   type String @db.VarChar(10)
 
