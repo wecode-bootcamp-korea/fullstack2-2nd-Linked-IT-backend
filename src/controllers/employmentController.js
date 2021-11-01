@@ -1,37 +1,24 @@
 import { employmentService } from '../services';
 
-const getEmploymentAnnouncement = async (req, res) => {
+const getJobPostingList = async (req, res) => {
   try {
-    const employmentAnnouncementList =
-      await employmentService.getEmploymentAnnouncement();
-    res.status(200).send(employmentAnnouncementList);
+    const jobPostingList = await employmentService.getJobPostingList();
+    res.status(200).send(jobPostingList);
   } catch (err) {
     console.log(err);
   }
 };
 
-const getCompanyProfile = async (req, res) => {
+const getJobPostingDetail = async (req, res) => {
   try {
-    const { jobId } = req.query;
-    const companyProfileList = await employmentService.getCompanyProfile(jobId);
-    res.status(200).send(companyProfileList);
+    const jobPostingDetail = await employmentService.getJobPostingDetail();
+    res.status(200).send(jobPostingDetail);
   } catch (err) {
     console.log(err);
   }
 };
 
-const getUserByEmploymentAnnouncementId = async (req, res) => {
-  try {
-    // const { userId } = req.query;
-    const userByCompanyPost =
-      await employmentService.getUserByEmploymentAnnouncementId();
-    res.status(200).send(userByCompanyPost);
-  } catch (err) {
-    console.log(err);
-  }
-};
 export default {
-  getEmploymentAnnouncement,
-  getCompanyProfile,
-  getUserByEmploymentAnnouncementId,
+  getJobPostingList,
+  getJobPostingDetail,
 };

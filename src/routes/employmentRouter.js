@@ -2,11 +2,7 @@ import express from 'express';
 import { employmentController } from '../controllers';
 const router = express.Router();
 
-router.get('/search', employmentController.getEmploymentAnnouncement);
-router.get(
-  '/search/detail',
-  employmentController.getUserByEmploymentAnnouncementId
-);
-router.get('/search/profile', employmentController.getCompanyProfile);
+router.get('/search', employmentController.getJobPostingList);
+router.get('/search/detail', employmentController.getJobPostingDetail);
 
 export default router;

@@ -1,7 +1,7 @@
 import prisma from '../../prisma';
 import { getTimeSincePosted } from '../utils/getTimeSincePosted';
 
-const getEmploymentAnnouncement = async () => {
+const getJobPostingList = async () => {
   let getPostCreatedAt = await prisma.$queryRaw`
     SELECT
       ea.created_at AS createdAt
@@ -65,15 +65,24 @@ const getEmploymentAnnouncement = async () => {
   }
   return await prisma.$queryRaw`
     SELECT
-      ea.id,
+      ea.id AS jobPostingId,
+      ci.company_profile_url AS companyProfileImgUrl,
       ea.headline AS jobPostingTitle,
-      ea.created_at AS createdAt,
-      ea.is_easy_apply AS isEasyApply,
-      ea.time_since_posted AS timeSincePosted,
-      ci.company_profile_url AS profileImgUrl,
+      c.id AS companyId,
+      c.english_name AS companyName,
+      c.location AS companyLocation,
       wt.type AS workType, 
-      c.english_name AS companyName, c.location AS companyLocation
-    FROM 
+      ea.time_since_posted AS timeSincePosted,
+        (
+          SELECT
+            COUNT(employment_announcement_id) AS count
+          FROM
+            applications a
+          WHERE
+            a.employment_announcement_id = ea.id
+        ) AS applicantCount,
+      ea.is_easy_apply AS isEasyApply
+      FROM 
       employment_announcements ea
     LEFT JOIN
       company_images ci
@@ -90,80 +99,123 @@ const getEmploymentAnnouncement = async () => {
   ;`;
 };
 
-const getCompanyProfile = async (jobId) => {
-  jobId;
+const getJobPostingDetail = async () => {
   return await prisma.$queryRaw`
-    SELECT
-      c.id,
-      c.english_name AS companyName,
-      c.location AS companyLocation,
-      c.introduction AS companySummary,
-      c.number_of_employee AS TotalNumberOfEmployees,
-      ci.company_profile_url AS profileImgUrl,
-      i.industry_type AS companyCategory
-    FROM
-      companies c
-    LEFT JOIN
-      industries i
-    ON
-      i.id = c.industry_id  
-    LEFT JOIN
-      company_images ci
-    ON
-      ci.id = c.id    
-  ;`;
+  SELECT
+    ea.id AS jobPostingId,
+    ea.headline AS jobPostingTitle,
+    wt.type AS workType,
+    ea.time_since_posted AS timeSincePosted,
+    (
+      SELECT
+      COUNT(employment_announcement_id) AS count
+      FROM
+      applications a
+      WHERE
+      a.employment_announcement_id = ea.id
+      ) AS applicantCount,
+    ea.is_easy_apply AS isEasyApply,
+    et.type AS employmentType,
+    ea.headline AS description,
+    ea.salary_information AS salaryRange,
+    c.id AS companyId,
+    ci.company_profile_url AS companyProfileImageUrl,
+    c.english_name AS companyName,
+    i.industry_type AS companyCategory,
+    c.location AS companyLocation,
+    c.number_of_employee AS staffCount,
+    c.introduction AS companyIntroduction,
+      (SELECT
+      GROUP_CONCAT(eaa.employment_announcement_image_url, '')
+      FROM
+      employment_announcement_attachments eaa
+      WHERE
+      eaa.employment_announcement_id = ea.id
+      ) AS companyDetailImages,
+    u.id AS AuthorId,  
+    u.first_name AS AuthorFirstName,
+    u.last_name AS AuthorLastName,
+    ui.user_profile_url AS AuthorProfileImageUrl,
+    p.position_name AS AuthorPosition,
+    ea.content AS jobPostingContent
+      FROM
+        users u
+      LEFT JOIN
+        user_images ui
+      ON
+        ui.id = u.id
+      LEFT JOIN
+        user_positions up
+      ON
+        up.user_id = u.id
+      LEFT JOIN
+        positions p
+      ON
+        p.id = up.position_id
+      LEFT JOIN
+        employment_announcements ea
+      ON
+        ea.id = u.id
+      LEFT JOIN
+        work_types wt 
+      ON
+        ea.work_type_id = wt.id
+      LEFT JOIN
+        companies c
+      ON
+        c.id = u.id
+      LEFT JOIN
+        company_images ci
+      ON
+        ea.id = ci.id
+      LEFT JOIN
+        industries i
+      ON
+        i.id = c.industry_id
+      LEFT JOIN
+        employment_types et
+      ON
+        et.id = ea.employment_type_id
+      `;
 };
-
-const getUserByEmploymentAnnouncementId = async () => {
-  return await prisma.$queryRaw`
-    SELECT
-      u.id,
-      u.last_name AS LastName,
-      u.first_name AS firstName,
-      ui.user_profile_url AS userProfileUrl,
-      p.position_name AS positionName,
-      ea.content,
-      ea.salary_information AS salaryInformation,
-      c.number_of_employee AS numberOfEmployee,
-      wt.type AS workType,
-        (SELECT
-          GROUP_CONCAT(eaa.employment_announcement_image_url, '')
-        FROM
-          employment_announcement_attachments eaa
-        WHERE
-          eaa.employment_announcement_id = ea.id
-        ) AS employmentAnnouncementDetailImage
-    FROM
-      users u
-    LEFT JOIN
-      user_images ui
-    ON
-      ui.id = u.id
-    LEFT JOIN
-      user_positions up
-    ON
-      up.user_id = u.id
-    LEFT JOIN
-      positions p
-    ON
-      p.id = up.position_id
-    LEFT JOIN
-      employment_announcements ea
-    ON
-      ea.id = u.id
-    LEFT JOIN
-      work_types wt 
-    ON
-      ea.work_type_id = wt.id
-    LEFT JOIN
-      companies c
-    ON
-      c.id = u.id 
-  `;
-};
+// 회사 리스트는 나중에 검색 창에서 재사용 목적으로 남겨 둠
+// const getCompanyProfile = async (jobId) => {
+//   jobId;
+//   return await prisma.$queryRaw`
+//     SELECT
+//       c.id,
+//       c.english_name AS companyName,
+//       c.location AS companyLocation,
+//       c.introduction AS companySummary,
+//       c.number_of_employee AS TotalNumberOfEmployees,
+//       ci.company_profile_url AS companyProfileImageUrl,
+//       i.industry_type AS companyCategory,
+//       (
+//           SELECT
+//             COUNT(employment_announcement_id) AS count
+//           FROM
+//             applications a
+//           WHERE
+//             a.employment_announcement_id = ea.id
+//         ) AS countOfApply
+//     FROM
+//       companies c
+//     LEFT JOIN
+//       industries i
+//     ON
+//       i.id = c.industry_id
+//     LEFT JOIN
+//       company_images ci
+//     ON
+//       ci.id = c.id
+//     LEFT JOIN
+//       employment_announcements ea
+//     ON
+//       ea.id = c.id
+//   ;`;
+// };
 
 export default {
-  getEmploymentAnnouncement,
-  getCompanyProfile,
-  getUserByEmploymentAnnouncementId,
+  getJobPostingList,
+  getJobPostingDetail,
 };
