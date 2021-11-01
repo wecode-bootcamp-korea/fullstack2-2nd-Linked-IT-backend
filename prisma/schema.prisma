@@ -423,14 +423,14 @@ model Friend {
   userId          Int           @map("user_id")
   friend          User          @relation("friend", fields: [friendId], references: [id])
   friendId        Int           @map("friend_id")
-  friendsStatus   FriendsStatus @relation(fields: [friendsStatusId], references: [id])
-  friendsStatusId Int           @map("friends_status_id")
+  friendStatus   FriendStatus @relation(fields: [friendStatusId], references: [id])
+  friendStatusId Int           @map("friend_status_id")
 
   @@id([userId, friendId])
   @@map("friends")
 }
 
-model FriendsStatus {
+model FriendStatus {
   id   Int    @id @default(autoincrement())
   type String @db.VarChar(10)
 
