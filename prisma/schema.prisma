@@ -31,6 +31,7 @@ model User {
   PostLike               PostLike[]
   Comment                Comment[]
   CommentLike            CommentLike[]
+
   Position               Position[]
   UserPosition           UserPosition[]
 
@@ -243,6 +244,7 @@ model Position {
 
   User   User? @relation(fields: [userId], references: [id])
   userId Int?
+
   @@map("positions")
 }
 
