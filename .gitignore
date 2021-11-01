@@ -1,5 +1,5 @@
 node_modules
-
+prisma/schema.prisma
 # Created by https://www.toptal.com/developers/gitignore/api/macos,node
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,node
 
