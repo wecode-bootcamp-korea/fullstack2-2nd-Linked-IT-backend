@@ -24,12 +24,14 @@ const getProfile = async (userId) => {
             , cinfo.user_id           userId
             , cinfo.scope_of_public   userScopeOfPublic
         FROM  users u
+   LEFT JOIN  introductions intro
+          ON  u.id = intro.user_id
    LEFT JOIN  user_images ui
           ON  u.id = ui.user_id
    LEFT JOIN  contact_informations cinfo
           ON  u.id = cinfo.user_id
    LEFT JOIN  countries c
-          ON  u.id = c.id
+          ON  intro.country_id = c.id
    LEFT JOIN  states
           ON  c.id = states.country_id
    LEFT JOIN  cities

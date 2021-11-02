@@ -11,6 +11,7 @@ app.use(morgan('dev'));
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
+app.use(routes);
 
 app.use(routes);
 
