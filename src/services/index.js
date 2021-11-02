@@ -1,4 +1,5 @@
-import employmentDao from './employmentDao';
-import profileDao from './profileDao';
+import employmentService from './employmentService';
+import profileService from './profileService';
+import mayKnowFriendService from './mayKnowFriendService';
 
-export { profileDao, employmentDao };
+export { employmentService, profileService, mayKnowFriendService };
