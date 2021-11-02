@@ -1,15 +1,4 @@
 import employmentController from './employmentController';
-// import commentController from './commentController';
-// import mainController from './mainController';
-// import profileController from './profileController';
-// import userController from './userController';
-// import searchController from './searchController';
+import profileController from './profileController';
 
-export {
-  employmentController,
-  // commentController,
-  // mainController,
-  // profileController,
-  // userController,
-  // searchController
-};
+export { employmentController, profileController };
