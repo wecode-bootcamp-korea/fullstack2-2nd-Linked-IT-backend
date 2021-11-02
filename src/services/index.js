@@ -1,15 +1,10 @@
 import employmentService from './employmentService';
 import searchService from './searchService';
-// import commentService from './commentService';
-// import mainService from './mainService';
-// import profileService from './profileService';
-// import userService from './userService';
-
+import profileService from './profileService';
+import mayKnowFriendService from './mayKnowFriendService';
 export {
   employmentService,
   searchService,
-  // commentService,
-  // mainService,
-  // profileService,
-  // userService,
+  profileService,
+  mayKnowFriendService,
 };

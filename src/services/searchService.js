@@ -10,7 +10,13 @@ const getSearchUserList = async (query) => {
   return searchUserList;
 };
 
+const getSearchAllList = async (query) => {
+  const searchAllList = await searchDao.getSearchAllList(query);
+  return searchAllList;
+};
+
 export default {
   getSearchCompanyList,
   getSearchUserList,
+  getSearchAllList,
 };

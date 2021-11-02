@@ -20,7 +20,18 @@ const getSearchUserList = async (req, res) => {
   }
 };
 
+const getSearchAllList = async (req, res) => {
+  try {
+    const query = req.query;
+    const searchAllList = await searchService.getSearchAllList(query);
+    res.status(200).send(searchAllList);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 export default {
   getSearchCompanyList,
   getSearchUserList,
+  getSearchAllList,
 };
