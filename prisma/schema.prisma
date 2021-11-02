@@ -53,11 +53,11 @@ model ScopeOfPublic {
   id   Int    @id @default(autoincrement())
   type String @db.VarChar(30)
 
-  postScope          Post?               @relation("post_scope")
-  commentScope       Post?               @relation("comment_scope")
-  ContactInformation ContactInformation?
-  Education          Education?
-  PositionCareer     PositionCareer?
+  postScope          Post[]               @relation("post_scope")
+  commentScope       Post[]               @relation("comment_scope")
+  ContactInformation ContactInformation[]
+  Education          Education[]
+  PositionCareer     PositionCareer[]
 
   @@map("scope_of_publics")
 }
