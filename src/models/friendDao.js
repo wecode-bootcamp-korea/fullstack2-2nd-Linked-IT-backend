@@ -1,8 +1,8 @@
 import prisma from '../../prisma';
 import { Prisma } from '@prisma/client';
 
-const getMayKnowFriends = async (userId) => {
-  const friendsRelationList = await prisma.$queryRaw`
+const getFriend = async (userId) => {
+  const getFriendList = await prisma.$queryRaw`
     SELECT  f.friend_id
           , f.user_id
           , f.friend_status_id
@@ -14,11 +14,11 @@ const getMayKnowFriends = async (userId) => {
       ;
     `;
 
-  const newArr = friendsRelationList.map((el) => el.friend_id);
+  const newArr = getFriendList.map((el) => el.friend_id);
   const newSet = new Set(newArr);
-  const mayKnowList = [...newSet];
+  const friendList = [...newSet];
 
-  const getMayKnow = await prisma.$queryRaw`
+  const filterList = await prisma.$queryRaw`
     SELECT  u.id
           , u.first_name
           , u.last_name 
@@ -27,10 +27,10 @@ const getMayKnowFriends = async (userId) => {
       FROM  users u
  LEFT JOIN  position_careers pc
         ON  pc.user_id = u.id
-     WHERE  u.id IN (${Prisma.join(mayKnowList)})
+     WHERE  u.id IN (${Prisma.join(friendList)})
      ;
     `;
-  return getMayKnow;
+  return filterList;
 };
 
-export default { getMayKnowFriends };
+export default { getFriend };
