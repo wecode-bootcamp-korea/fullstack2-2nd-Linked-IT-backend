@@ -508,7 +508,8 @@ model PostLike {
 
 model PostLikeStyle {
   id Int @id @default(autoincrement())
-
+  type String @db.VarChar(100)
+  
   PostLike PostLike?
 
   @@map("post_like_styles")
