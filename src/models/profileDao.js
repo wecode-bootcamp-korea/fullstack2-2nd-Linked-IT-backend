@@ -59,9 +59,9 @@ const getEducation = async (userId) => {
           , m.major_name        majorName
       FROM  educations e
  LEFT JOIN  users u
-        ON  e.id = u.id
+        ON  e.user_id = u.id
  LEFT JOIN  colleges c
-        ON  e.id = c.id
+        ON  e.college_id = c.id
  LEFT JOIN  degrees d
         ON  e.degree_id = d.id
  LEFT JOIN  majors m
@@ -103,7 +103,7 @@ const getCareer = async (userId) => {
    LEFT JOIN  industries i
           ON  pc.industry_id = i.id
    LEFT JOIN  user_positions up
-          ON  u.id = up.id
+          ON  u.id = up.user_id
    LEFT JOIN  positions p
           ON  up.position_id = p.id
    LEFT JOIN  employment_types et
