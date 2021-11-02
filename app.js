@@ -2,7 +2,7 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import cors from 'cors';
-import router from './src/routes';
+import routes from './src/routes';
 
 const app = express();
 
@@ -11,11 +11,9 @@ app.use(morgan('dev'));
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
-app.use(router);
+app.use(routes);
 
-app.get('/ping', (req, res) => {
-  res.json('pong');
-});
+app.use(routes);
 
 app.use((req, res, next) => {
   next(new Error(`NOT_FOUND_${req.originalUrl}`));

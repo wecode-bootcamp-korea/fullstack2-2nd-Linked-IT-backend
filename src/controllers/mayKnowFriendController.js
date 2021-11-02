@@ -1,9 +1,11 @@
-import { friendCardService } from '../services';
+import { mayKnowFriendService } from '../services';
 
 const getMayKnowFriends = async (req, res) => {
   try {
     const userId = req.params.id;
-    const getMayKnowFriends = await friendCardService.getMayKnowFriends(userId);
+    const getMayKnowFriends = await mayKnowFriendService.getMayKnowFriends(
+      userId
+    );
     res.status(200).json(getMayKnowFriends);
   } catch (err) {
     console.error(err);

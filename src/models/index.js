@@ -1,3 +1,5 @@
-import friendCardDao from './friendCardDao';
+import employmentDao from './employmentDao';
+import profileDao from './profileDao';
+import mayKnowFriendDao from './mayKnowFriendDao';
 
-export { friendCardDao };
+export { profileDao, employmentDao, mayKnowFriendDao };

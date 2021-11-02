@@ -1,8 +1,12 @@
 import express from 'express';
-import friendCardRouter from './friendCardRouter';
+import employmentRoute from './employmentRouter';
+import profileRoute from './profileRouter';
+import mayKnowFriendRoute from './mayKnowFriendRouter';
 
-const Router = express.Router();
+const router = express.Router();
 
-Router.use('/profile', friendCardRouter);
+router.use('/jobs', employmentRoute);
+router.use('/profile', profileRoute);
+router.use('/friend', mayKnowFriendRoute);
 
-export default Router;
+export default router;

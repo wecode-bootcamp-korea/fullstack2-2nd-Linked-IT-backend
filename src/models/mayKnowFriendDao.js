@@ -5,7 +5,7 @@ const getMayKnowFriends = async (userId) => {
   const friendsRelationList = await prisma.$queryRaw`
     SELECT  f.friend_id
           , f.user_id
-          , f.friends_status_id
+          , f.friend_status_id
       FROM  friends f
      WHERE  f.user_id IN (SELECT  f.friend_id
                             FROM  friends f
