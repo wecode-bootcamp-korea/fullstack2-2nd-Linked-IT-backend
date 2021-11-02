@@ -1,7 +1,7 @@
 import { employmentDao } from '../models';
 
-const getJobPostingList = async () => {
-  const jobPostingList = await employmentDao.getJobPostingList();
+const getJobPostingList = async (filterWord) => {
+  const jobPostingList = await employmentDao.getJobPostingList(filterWord);
   return jobPostingList;
 };
 

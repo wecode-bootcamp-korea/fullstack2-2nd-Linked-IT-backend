@@ -1,7 +1,21 @@
+import { Prisma } from '.prisma/client';
 import prisma from '../../prisma';
 import { getTimeSincePosted } from '../utils/getTimeSincePosted';
 
-const getJobPostingList = async () => {
+const result = async (filterWord) => {};
+result();
+
+const getJobPostingList = async (filterWord) => {
+  console.log(filterWord);
+  let date = await prisma.$queryRaw`
+    SELECT
+      ea.created_at
+    FROM
+      employment_announcements ea
+    WHERE
+      ea.created_at BETWEEN DATE_ADD(NOW(), INTERVAL -1 DAY) AND NOW()`;
+  console.log(date);
+
   let getPostCreatedAt = await prisma.$queryRaw`
     SELECT
       ea.created_at AS createdAt
@@ -63,6 +77,7 @@ const getJobPostingList = async () => {
       new Error('Wrong Time');
     }
   }
+
   return await prisma.$queryRaw`
     SELECT
       ea.id AS jobPostingId,
@@ -82,7 +97,7 @@ const getJobPostingList = async () => {
             a.employment_announcement_id = ea.id
         ) AS applicantCount,
       ea.is_easy_apply AS isEasyApply
-      FROM 
+    FROM 
       employment_announcements ea
     LEFT JOIN
       company_images ci
@@ -96,7 +111,51 @@ const getJobPostingList = async () => {
       companies c
     ON
       ci.id = c.id
-  ;`;
+    LEFT JOIN
+      employment_types et
+    ON
+      et.id = ea.employment_type_id
+      ${
+        filterWord.f_AL
+          ? Prisma.sql`WHERE ea.is_easy_apply = ${filterWord.f_AL}`
+          : Prisma.empty
+      }
+      ${
+        filterWord.f_WT
+          ? Prisma.sql`WHERE wt.id = ${filterWord.f_WT}`
+          : Prisma.empty
+      }
+      ${
+        filterWord.f_ET
+          ? Prisma.sql`WHERE wt.id = ${filterWord.f_WT}`
+          : Prisma.empty
+      }
+      ${
+        filterWord.f_JT
+          ? Prisma.sql`WHERE et.id = ${filterWord.f_JT}`
+          : Prisma.empty
+      }
+      ${
+        filterWord.f_C
+          ? Prisma.sql`WHERE c.id = ${filterWord.f_C}`
+          : Prisma.empty
+      }
+      ${
+        filterWord.f_TPR === 'DAY'
+          ? Prisma.sql`WHERE ea.created_at BETWEEN DATE_ADD(NOW(), INTERVAL -1 DAY) AND NOW()`
+          : Prisma.empty
+      }
+      ${
+        filterWord.f_TPR === 'WEEK'
+          ? Prisma.sql`WHERE ea.created_at BETWEEN DATE_ADD(NOW(), INTERVAL -1 WEEK) AND NOW()`
+          : Prisma.empty
+      }
+      ${
+        filterWord.f_TPR === 'MONTH'
+          ? Prisma.sql`WHERE ea.created_at BETWEEN DATE_ADD(NOW(), INTERVAL -1 MONTH) AND NOW()`
+          : Prisma.empty
+      }
+    `;
 };
 
 const getJobPostingDetail = async () => {
@@ -178,11 +237,10 @@ const getJobPostingDetail = async () => {
         et.id = ea.employment_type_id
       `;
 };
-// 회사 리스트는 나중에 검색 창에서 재사용 목적으로 남겨 둠
-// const getCompanyProfile = async (jobId) => {
-//   jobId;
+
+// const getJobPostingByFiltering = async (query) => {
 //   return await prisma.$queryRaw`
-//     SELECT
+//   SELECT
 //       c.id,
 //       c.english_name AS companyName,
 //       c.location AS companyLocation,
@@ -214,6 +272,7 @@ const getJobPostingDetail = async () => {
 //       ea.id = c.id
 //   ;`;
 // };
+// 회사 리스트는 나중에 검색 창에서 재사용 목적으로 남겨 둠
 
 export default {
   getJobPostingList,
