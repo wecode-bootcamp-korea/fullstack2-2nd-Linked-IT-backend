@@ -42,13 +42,16 @@ model User {
   @@map("users")
 }
 
-enum ScopeOfPublic {
-  ANYONE
-  CONNECTINOS
-  NOONE
+model ScopeOfPublic {
+  id   Int    @id @default(autoincrement())
+  name String
 
 
-
+  ContactInformation ContactInformation[]
+  Education          Education[]
+  PositionCareer     PositionCareer[]
+  PostScope          Post[]               @relation("post_scope")
+  commentScope       Post[]               @relation("comment_scope")
 
 
   @@map("scope_of_publics")
@@ -118,7 +121,10 @@ model ContactInformation {
   user   User @relation(fields: [userId], references: [id])
   userId Int  @unique @map("user_id")
 
-  scopeOfPublic ScopeOfPublic @default(ANYONE)
+  scopeOfPublic   ScopeOfPublic @relation(fields: [scopeOfPublicId], references: [id])
+  scopeOfPublicId Int           @map("scope_of_public_id")
+
+
 
   InstantMessenger InstantMessenger[]
   Website          Website[]
@@ -158,15 +164,17 @@ model Education {
   activity        String? @db.VarChar(30)
   description     String? @db.VarChar(200)
 
-  college       College       @relation(fields: [collegeId], references: [id])
-  collegeId     Int           @map("college_id")
-  degree        Degree        @relation(fields: [degreeId], references: [id])
-  degreeId      Int           @map("degree_id")
-  major         Major         @relation(fields: [majorId], references: [id])
-  majorId       Int           @map("major_id")
-  user          User          @relation(fields: [userId], references: [id])
-  userId        Int           @unique @map("user_id")
-  scopeOfPublic ScopeOfPublic @default(ANYONE)
+  college   College @relation(fields: [collegeId], references: [id])
+  collegeId Int     @map("college_id")
+  degree    Degree  @relation(fields: [degreeId], references: [id])
+  degreeId  Int     @map("degree_id")
+  major     Major   @relation(fields: [majorId], references: [id])
+  majorId   Int     @map("major_id")
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int     @unique @map("user_id")
+
+  scopeOfPublic   ScopeOfPublic @relation(fields: [scopeOfPublicId], references: [id])
+  scopeOfPublicId Int           @map("scope_of_public_id")
 
   @@map("educations")
 }
@@ -220,7 +228,8 @@ model PositionCareer {
   EmploymentType   EmploymentType @relation(fields: [employmentTypeId], references: [id])
   employmentTypeId Int            @map("employment_type_id")
 
-  scopeOfPublic ScopeOfPublic @default(ANYONE)
+  scopeOfPublic   ScopeOfPublic @relation(fields: [scopeOfPublicId], references: [id])
+  scopeOfPublicId Int           @map("scope_of_public_id")
 
   Introduction Introduction[]
 
@@ -358,19 +367,23 @@ model RecruitmentUser {
 }
 
 model Post {
-  id                   Int            @id @default(autoincrement())
-  content              String         @db.VarChar(5000)
-  createdAt            DateTime       @default(now()) @map("created_at")
-  updatedAt            DateTime       @map("updated_at")
-  deletedAt            DateTime?      @map("deleted_at")
-  isDeleted            Boolean        @default(false) @map("is_deleted")
-  likeCount            Int?           @map("like_count")
-  postScopeOfPublic    ScopeOfPublic  @default(ANYONE)
-  commnetScopeOfPublic ScopeOfPublic  @default(ANYONE)
-  user                 User           @relation(fields: [userId], references: [id])
-  userId               Int            @map("user_id")
-  postAttachment       PostAttachment @relation(fields: [postAttachmentId], references: [id])
-  postAttachmentId     Int            @map("post_attachment_id")
+  id        Int       @id @default(autoincrement())
+  content   String    @db.VarChar(5000)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  isDeleted Boolean   @default(false) @map("is_deleted")
+  likeCount Int?      @map("like_count")
+
+  postScopeOfPublic      ScopeOfPublic @relation("post_scope", fields: [postScopeOfPublicId], references: [id])
+  postScopeOfPublicId    Int           @map("post_scope_of_public_id")
+  commentScopeOfPublic   ScopeOfPublic @relation("comment_scope", fields: [commentScopeOfPublicId], references: [id])
+  commentScopeOfPublicId Int           @map("commnet_scope_of_public_id")
+
+  user             User           @relation(fields: [userId], references: [id])
+  userId           Int            @map("user_id")
+  postAttachment   PostAttachment @relation(fields: [postAttachmentId], references: [id])
+  postAttachmentId Int            @map("post_attachment_id")
 
   PostHashtag PostHashtag[]
   PostLike    PostLike[]
