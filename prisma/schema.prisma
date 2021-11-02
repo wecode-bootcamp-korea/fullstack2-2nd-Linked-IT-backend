@@ -8,16 +8,17 @@ datasource db {
 }
 
 model User {
-  id                     Int                     @id @default(autoincrement())
-  firstName              String                  @map("first_name") @db.VarChar(30)
-  lastName               String                  @map("last_name") @db.VarChar(30)
-  email                  String                  @db.VarChar(100)
-  password               String                  @db.VarChar(30)
-  provider               String?                 @db.VarChar(100)
-  snsId                  String?                 @map("sns_id")
-  createdAt              DateTime?               @default(now()) @map("created_at")
-  updatedAt              DateTime?               @map("updated_at")
-  isDeleted              Boolean?                @default(false) @map("is_deleted")
+  id        Int       @id @default(autoincrement())
+  firstName String    @map("first_name") @db.VarChar(30)
+  lastName  String    @map("last_name") @db.VarChar(30)
+  email     String    @db.VarChar(100)
+  password  String    @db.VarChar(30)
+  provider  String?   @db.VarChar(100)
+  snsId     String?   @map("sns_id")
+  createdAt DateTime? @default(now()) @map("created_at")
+  updatedAt DateTime? @map("updated_at")
+  isDeleted Boolean?  @default(false) @map("is_deleted")
+
   Education              Education?
   ContactInformation     ContactInformation?
   EmploymentAnnouncement EmploymentAnnouncement?
@@ -30,37 +31,37 @@ model User {
   PostLike               PostLike[]
   Comment                Comment[]
   CommentLike            CommentLike[]
-  follow                 Follow[]                @relation("follower")
-  following              Follow[]                @relation("following")
-  user                   Friend[]                @relation("user")
-  friend                 Friend[]                @relation("friend")
-  UserPosition           UserPosition[]
+  Position               Position[]
+
+  follow    Follow[] @relation("follower")
+  following Follow[] @relation("following")
+  user      Friend[] @relation("user")
+  friend    Friend[] @relation("friend")
+
 
   @@map("users")
 }
 
-model UserPosition {
-  id         Int      @id @default(autoincrement())
-  user       User?    @relation(fields: [userId], references: [id])
-  userId     Int?     @map("user_id")
-  position   Position @relation(fields: [positionId], references: [id])
-  positionId Int      @map("position_id")
+model ScopeOfPublic {
+  id   Int    @id @default(autoincrement())
+  name String
 
-  @@map("user_positions")
-}
 
-enum ScopeOfPublic {
-  ANYONE
-  CONNECTINOS
-  NOONE
+  ContactInformation ContactInformation[]
+  Education          Education[]
+  PositionCareer     PositionCareer[]
+  PostScope          Post[]               @relation("post_scope")
+  commentScope       Post[]               @relation("comment_scope")
+
 
   @@map("scope_of_publics")
 }
 
 model Introduction {
-  id               Int            @id @default(autoincrement())
-  anotherName      String?        @map("another_name") @db.VarChar(50)
-  oneLineProfile   String         @map("one_line_profile") @db.VarChar(200)
+  id             Int     @id @default(autoincrement())
+  anotherName    String? @map("another_name") @db.VarChar(50)
+  oneLineProfile String  @map("one_line_profile") @db.VarChar(200)
+
   position         PositionCareer @relation(fields: [positionCareerId], references: [id])
   positionCareerId Int            @map("position_career_id")
   country          Country        @relation(fields: [countryId], references: [id])
@@ -85,11 +86,13 @@ model Country {
 }
 
 model State {
-  id        Int     @id @default(autoincrement())
-  stateName String  @map("state_name") @db.VarChar(50)
+  id        Int    @id @default(autoincrement())
+  stateName String @map("state_name") @db.VarChar(50)
+
   country   Country @relation(fields: [countryId], references: [id])
   countryId Int     @map("country_id")
-  City      City[]
+
+  City City[]
 
   @@map("states")
 }
@@ -97,25 +100,32 @@ model State {
 model City {
   id       Int    @id @default(autoincrement())
   cityName String @map("city_name") @db.VarChar(50)
-  state    State  @relation(fields: [stateId], references: [id])
-  stateId  Int    @map("state_id")
+
+  state   State @relation(fields: [stateId], references: [id])
+  stateId Int   @map("state_id")
 
   @@map("cities")
 }
 
 model ContactInformation {
-  id               Int                @id @default(autoincrement())
-  profileUrl       String?            @map("profile_url") @db.VarChar(2000)
-  phoneNumber      String?            @map("phone_number") @db.VarChar(30)
-  phoneType        Int?               @map("phone_type")
-  address          String?            @db.VarChar(100)
-  email            String?            @db.VarChar(100)
-  birthYear        Int?               @map("birth_year")
-  birthMonth       Int?               @map("birth_month")
-  birthDay         Int?               @map("birth_day")
-  user             User               @relation(fields: [userId], references: [id])
-  userId           Int                @unique @map("user_id")
-  scopeOfPublic    ScopeOfPublic      @default(ANYONE) @map("scope_of_public")
+  id          Int     @id @default(autoincrement())
+  profileUrl  String? @map("profile_url") @db.VarChar(2000)
+  phoneNumber String? @map("phone_number") @db.VarChar(30)
+  phoneType   Int?    @map("phone_type")
+  address     String? @db.VarChar(100)
+  email       String? @db.VarChar(100)
+  birthYear   Int?    @map("birth_year")
+  birthMonth  Int?    @map("birth_month")
+  birthDay    Int?    @map("birth_day")
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @unique @map("user_id")
+
+  scopeOfPublic   ScopeOfPublic @relation(fields: [scopeOfPublicId], references: [id])
+  scopeOfPublicId Int           @map("scope_of_public_id")
+
+
+
   InstantMessenger InstantMessenger[]
   Website          Website[]
 
@@ -123,9 +133,10 @@ model ContactInformation {
 }
 
 model Website {
-  id                   Int                @id @default(autoincrement())
-  websiteUrl           String             @map("website_url") @db.VarChar(300)
-  websiteType          String             @map("website_type") @db.VarChar(50)
+  id          Int    @id @default(autoincrement())
+  websiteUrl  String @map("website_url") @db.VarChar(300)
+  websiteType String @map("website_type") @db.VarChar(50)
+
   contactInformation   ContactInformation @relation(fields: [contactInformationId], references: [id])
   contactInformationId Int                @map("contact_information_id")
 
@@ -133,9 +144,10 @@ model Website {
 }
 
 model InstantMessenger {
-  id                   Int                @id @default(autoincrement())
-  messengerId          String             @map("messenger_id") @db.VarChar(100)
-  messengerType        String             @map("messenger_type") @db.VarChar(50)
+  id            Int    @id @default(autoincrement())
+  messengerId   String @map("messenger_id") @db.VarChar(100)
+  messengerType String @map("messenger_type") @db.VarChar(50)
+
   contactInformation   ContactInformation @relation(fields: [contactInformationId], references: [id])
   contactInformationId Int                @map("contact_information_id")
 
@@ -143,90 +155,104 @@ model InstantMessenger {
 }
 
 model Education {
-  id              Int           @id @default(autoincrement())
-  admissionMonth  Int?          @map("admission_month")
-  admissionYear   Int?          @map("admission_year")
-  graduationMonth Int?          @map("graduation_month")
-  graduationYear  Int?          @map("graduation_year")
-  grade           String?       @db.VarChar(30)
-  activity        String?       @db.VarChar(30)
-  description     String?       @db.VarChar(200)
-  college         College       @relation(fields: [collegeId], references: [id])
-  collegeId       Int           @map("college_id")
-  degree          Degree        @relation(fields: [degreeId], references: [id])
-  degreeId        Int           @map("degree_id")
-  major           Major         @relation(fields: [majorId], references: [id])
-  majorId         Int           @map("major_id")
-  user            User          @relation(fields: [userId], references: [id])
-  userId          Int           @unique @map("user_id")
-  scopeOfPublic   ScopeOfPublic @default(ANYONE) @map("scope_of_public")
+  id              Int     @id @default(autoincrement())
+  admissionMonth  Int?    @map("admission_month")
+  admissionYear   Int?    @map("admission_year")
+  graduationMonth Int?    @map("graduation_month")
+  graduationYear  Int?    @map("graduation_year")
+  grade           String? @db.VarChar(30)
+  activity        String? @db.VarChar(30)
+  description     String? @db.VarChar(200)
+
+  college   College @relation(fields: [collegeId], references: [id])
+  collegeId Int     @map("college_id")
+  degree    Degree  @relation(fields: [degreeId], references: [id])
+  degreeId  Int     @map("degree_id")
+  major     Major   @relation(fields: [majorId], references: [id])
+  majorId   Int     @map("major_id")
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int     @unique @map("user_id")
+
+  scopeOfPublic   ScopeOfPublic @relation(fields: [scopeOfPublicId], references: [id])
+  scopeOfPublicId Int           @map("scope_of_public_id")
 
   @@map("educations")
 }
 
 model Degree {
-  id        Int         @id @default(autoincrement())
-  type      String?     @db.VarChar(50)
+  id   Int    @id @default(autoincrement())
+  type String @db.VarChar(50)
+
   Education Education[]
 
   @@map("degrees")
 }
 
 model Major {
-  id        Int         @id @default(autoincrement())
-  majorName String      @map("major_name") @db.VarChar(50)
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(50)
+
   Education Education[]
 
   @@map("majors")
 }
 
 model College {
-  id          Int         @id @default(autoincrement())
-  collegeName String      @map("college_name") @db.VarChar(50)
-  location    String      @db.VarChar(100)
-  Education   Education[]
+  id       Int    @id @default(autoincrement())
+  name     String @db.VarChar(50)
+  location String @db.VarChar(100)
+
+  Education Education[]
 
   @@map("colleges")
 }
 
 model PositionCareer {
-  id                   Int            @id @default(autoincrement())
-  isCurrentPosition    Boolean        @default(true) @map("is_current_position")
-  isEndCurrentPosition Boolean        @default(false) @map("is_end_current_position")
-  startMonth           Int?           @map("start_month")
-  startYear            Int?           @map("start_year")
-  endMonth             Int?           @map("end_month")
-  endYear              Int?           @map("end_year")
-  headline             String         @db.VarChar(100)
-  description          String?        @db.VarChar(2000)
-  position             Position       @relation(fields: [positionId], references: [id])
-  positionId           Int            @map("position_id")
-  company              Company        @relation(fields: [companyId], references: [id])
-  companyId            Int            @map("company_id")
-  Industry             Industry       @relation(fields: [industryId], references: [id])
-  industryId           Int            @map("industry_id")
-  User                 User           @relation(fields: [userId], references: [id])
-  userId               Int            @map("user_id")
-  EmploymentType       EmploymentType @relation(fields: [employmentTypeId], references: [id])
-  employmentTypeId     Int            @map("employment_type_id")
-  scopeOfPublic        ScopeOfPublic  @default(ANYONE) @map("scope_of_public")
-  Introduction         Introduction[]
+  id                   Int     @id @default(autoincrement())
+  isCurrentPosition    Boolean @default(true) @map("is_current_position")
+  isEndCurrentPosition Boolean @default(false) @map("is_end_current_position")
+
+  startDateAt DateTime @map("start_date_at")
+  endDateAt   DateTime @map("end_date_at")
+  headline    String   @db.VarChar(100)
+  description String?  @db.VarChar(2000)
+
+  position         Position       @relation(fields: [positionId], references: [id])
+  positionId       Int            @map("position_id")
+  company          Company        @relation(fields: [companyId], references: [id])
+  companyId        Int            @map("company_id")
+  Industry         Industry       @relation(fields: [industryId], references: [id])
+  industryId       Int            @map("industry_id")
+  User             User           @relation(fields: [userId], references: [id])
+  userId           Int            @map("user_id")
+  EmploymentType   EmploymentType @relation(fields: [employmentTypeId], references: [id])
+  employmentTypeId Int            @map("employment_type_id")
+
+  scopeOfPublic   ScopeOfPublic @relation(fields: [scopeOfPublicId], references: [id])
+  scopeOfPublicId Int           @map("scope_of_public_id")
+
+  Introduction Introduction[]
 
   @@map("position_careers")
 }
 
 model Position {
-  id             Int              @id @default(autoincrement())
-  positionName   String           @map("position_name") @db.VarChar(100)
-  UserPosition   UserPosition[]
+  id           Int    @id @default(autoincrement())
+  positionName String @map("position_name") @db.VarChar(30)
+
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @map("user_id")
+
   PositionCareer PositionCareer[]
 
   @@map("positions")
 }
 
 model Industry {
-  id             Int              @id @default(autoincrement())
-  industryType   String           @map("industry_type") @db.VarChar(100)
+  id           Int    @id @default(autoincrement())
+  industryType String @map("industry_type") @db.VarChar(100)
+
   PositionCareer PositionCareer[]
   Company        Company[]
   Introduction   Introduction[]
@@ -235,17 +261,19 @@ model Industry {
 }
 
 model UserImage {
-  id                Int     @id @default(autoincrement())
-  userProfileUrl    String? @map("user_profile_url") @db.VarChar(2000)
-  userBackgroundUrl String? @map("user_background_url") @db.VarChar(2000)
-  user              User    @relation(fields: [userId], references: [id])
-  userId            Int     @unique @map("user_id")
+  id                Int    @id @default(autoincrement())
+  userProfileUrl    String @map("user_profile_url") @db.VarChar(2000)
+  userBackgroundUrl String @map("user_background_url") @db.VarChar(2000)
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @unique @map("user_id")
 
   @@map("user_images")
 }
 
 model Application {
-  id                       Int                    @id @default(autoincrement())
+  id Int @id @default(autoincrement())
+
   user                     User                   @relation(fields: [userId], references: [id])
   userId                   Int                    @map("user_id")
   employmentAnnouncement   EmploymentAnnouncement @relation(fields: [employmentAnnouncementId], references: [id])
@@ -255,8 +283,9 @@ model Application {
 }
 
 model EmploymentType {
-  id                     Int                      @id @default(autoincrement())
-  type                   String                   @db.VarChar(50)
+  id   Int    @id @default(autoincrement())
+  type String @db.VarChar(50)
+
   PositionCareer         PositionCareer[]
   EmploymentAnnouncement EmploymentAnnouncement[]
 
@@ -264,57 +293,51 @@ model EmploymentType {
 }
 
 model EmploymentAnnouncement {
-  id                                Int                                 @id @default(autoincrement())
-  headline                          String                              @db.VarChar(100)
-  content                           String                              @db.MediumText
-  createdAt                         DateTime                            @default(now()) @map("created_at")
-  isEasyApply                       Boolean                             @default(false) @map("is_easy_apply")
-  timeSincePosted                   String?                             @map("time_since_posted")
-  salaryInformation                 String?                             @map("salary_information")
-  employmentType                    EmploymentType                      @relation(fields: [employmentTypeId], references: [id])
-  employmentTypeId                  Int                                 @map("employment_type_id")
-  workType                          WorkType                            @relation(fields: [workTypeId], references: [id])
-  workTypeId                        Int                                 @map("work_type_id")
-  user                              User                                @relation(fields: [userId], references: [id])
-  userId                            Int                                 @unique @map("user_id")
-  CompanyImage                      CompanyImage[]
-  Application                       Application[]
-  EmploymentAnnouncementAttachments EmploymentAnnouncementAttachments[]
+  id                Int      @id @default(autoincrement())
+  headline          String   @db.VarChar(100)
+  content           String   @db.MediumText
+  createdAt         DateTime @default(now()) @map("created_at")
+  numberOfApplicant Int      @map("number_of_applicant")
+  isEasyApply       Boolean  @default(false) @map("is_easy_apply")
+
+
+  employmentType   EmploymentType @relation(fields: [employmentTypeId], references: [id])
+  employmentTypeId Int            @map("employment_type_id")
+  workType         WorkType       @relation(fields: [workTypeId], references: [id])
+  workTypeId       Int            @map("work_type_id")
+  user             User           @relation(fields: [userId], references: [id])
+  userId           Int            @unique @map("user_id")
+
+  CompanyImage CompanyImage[]
+  application  Application[]
 
   @@map("employment_announcements")
 }
 
-model EmploymentAnnouncementAttachments {
-  id                             Int                    @id @default(autoincrement())
-  employmentAnnouncement         EmploymentAnnouncement @relation(fields: [employmentAnnouncementId], references: [id])
-  employmentAnnouncementId       Int                    @map("employment_announcement_id")
-  employmentAnnouncementImageUrl String?                @map("employment_announcement_image_url")
-
-  @@map("employment_announcement_attachments")
-}
-
 model WorkType {
-  id                     Int                      @id @default(autoincrement())
-  type                   String                   @db.VarChar(30)
+  id   Int    @id @default(autoincrement())
+  type String @db.VarChar(30)
+
   EmploymentAnnouncement EmploymentAnnouncement[]
 
   @@map("work_types")
 }
 
 model PostHashtag {
-  id        Int     @id @default(autoincrement())
+  id Int @id @default(autoincrement())
+
   post      Post    @relation(fields: [postId], references: [id])
   postId    Int     @map("post_id")
   hashtag   Hashtag @relation(fields: [hashtagId], references: [id])
   hashtagId Int     @map("hashtag_id")
-
   @@map("post_hashtags")
 }
 
 model CompanyImage {
-  id                       Int                    @id @default(autoincrement())
-  companyProfileUrl        String?                @map("company_profile_url") @db.VarChar(2000)
-  companyBackgroundUrl     String?                @map("company_background_url") @db.VarChar(2000)
+  id                   Int    @id @default(autoincrement())
+  companyProfileUrl    String @map("company_profile_url") @db.VarChar(2000)
+  companyBackgroundUrl String @map("company_background_url") @db.VarChar(2000)
+
   company                  Company                @relation(fields: [companyId], references: [id])
   companyId                Int                    @map("company_id")
   employmentAnnouncement   EmploymentAnnouncement @relation(fields: [employmentAnnouncementId], references: [id])
@@ -324,7 +347,8 @@ model CompanyImage {
 }
 
 model CommentLike {
-  id        Int     @id @default(autoincrement())
+  id Int @id @default(autoincrement())
+
   comment   Comment @relation(fields: [commentId], references: [id])
   commentId Int     @map("comment_id")
   user      User    @relation(fields: [userId], references: [id])
@@ -334,7 +358,8 @@ model CommentLike {
 }
 
 model RecruitmentUser {
-  id     Int  @id @default(autoincrement())
+  id Int @id @default(autoincrement())
+
   user   User @relation(fields: [userId], references: [id])
   userId Int  @unique @map("user_id")
 
@@ -342,84 +367,95 @@ model RecruitmentUser {
 }
 
 model Post {
-  id                   Int            @id @default(autoincrement())
-  content              String         @db.VarChar(5000)
-  createdAt            DateTime       @default(now()) @map("created_at")
-  updatedAt            DateTime       @map("updated_at")
-  deletedAt            DateTime?      @map("deleted_at")
-  isDeleted            Boolean        @default(false) @map("is_deleted")
-  likeCount            Int?           @map("like_count")
-  postScopeOfPublic    ScopeOfPublic  @default(ANYONE) @map("post_scope_of_public")
-  commentScopeOfPublic ScopeOfPublic  @default(ANYONE) @map("comment_scope_of_public")
-  user                 User           @relation(fields: [userId], references: [id])
-  userId               Int            @map("user_id")
-  postAttachment       PostAttachment @relation(fields: [postAttachmentId], references: [id])
-  postAttachmentId     Int            @map("post_attachment_id")
-  PostHashtag          PostHashtag[]
-  PostLike             PostLike[]
-  Comment              Comment[]
+  id        Int       @id @default(autoincrement())
+  content   String    @db.VarChar(5000)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  isDeleted Boolean   @default(false) @map("is_deleted")
+  likeCount Int?      @map("like_count")
+
+  postScopeOfPublic      ScopeOfPublic @relation("post_scope", fields: [postScopeOfPublicId], references: [id])
+  postScopeOfPublicId    Int           @map("post_scope_of_public_id")
+  commentScopeOfPublic   ScopeOfPublic @relation("comment_scope", fields: [commentScopeOfPublicId], references: [id])
+  commentScopeOfPublicId Int           @map("commnet_scope_of_public_id")
+
+  user             User           @relation(fields: [userId], references: [id])
+  userId           Int            @map("user_id")
+  postAttachment   PostAttachment @relation(fields: [postAttachmentId], references: [id])
+  postAttachmentId Int            @map("post_attachment_id")
+
+  PostHashtag PostHashtag[]
+  PostLike    PostLike[]
+  Comment     Comment[]
 
   @@map("posts")
 }
 
 model Company {
-  id               Int              @id @default(autoincrement())
-  koreanName       String?          @map("korean_name") @db.VarChar(100)
-  englishName      String           @map("english_name") @db.VarChar(200)
-  introduction     String           @db.MediumText
-  location         String           @db.VarChar(100)
-  numberOfEmployee String           @map("number_of_employee") @db.VarChar(30)
-  industry         Industry         @relation(fields: [industryId], references: [id])
-  industryId       Int              @map("industry_id")
-  CompanyImage     CompanyImage[]
-  PositionCareer   PositionCareer[]
+  id               Int     @id @default(autoincrement())
+  koreanName       String? @map("korean_name") @db.VarChar(100)
+  englishName      String  @map("english_name") @db.VarChar(200)
+  introduction     String  @db.MediumText
+  location         String  @db.VarChar(100)
+  numberOfEmployee String  @map("number_of_employee") @db.VarChar(30)
+
+  industry   Industry @relation(fields: [industryId], references: [id])
+  industryId Int      @map("industry_id")
+
+  CompanyImage   CompanyImage[]
+  PositionCareer PositionCareer[]
 
   @@map("companies")
 }
 
 model Hashtag {
-  id          Int           @id @default(autoincrement())
-  title       String        @db.VarChar(30)
+  id    Int    @id @default(autoincrement())
+  title String @db.VarChar(30)
+
   PostHashtag PostHashtag[]
 
   @@map("hashtags")
 }
 
 model Friend {
-  user           User         @relation("user", fields: [userId], references: [id])
-  userId         Int          @map("user_id")
-  friend         User         @relation("friend", fields: [friendId], references: [id])
-  friendId       Int          @map("friend_id")
-  friendStatus   FriendStatus @relation(fields: [friendStatusId], references: [id])
-  friendStatusId Int          @map("friend_status_id")
+  user            User          @relation("user", fields: [userId], references: [id])
+  userId          Int           @map("user_id")
+  friend          User          @relation("friend", fields: [friendId], references: [id])
+  friendId        Int           @map("friend_id")
+  friendsStatus   FriendsStatus @relation(fields: [friendsStatusId], references: [id])
+  friendsStatusId Int           @map("friends_status_id")
 
   @@id([userId, friendId])
   @@map("friends")
 }
 
-model FriendStatus {
-  id     Int      @id @default(autoincrement())
-  type   String   @db.VarChar(10)
+model FriendsStatus {
+  id   Int    @id @default(autoincrement())
+  type String @db.VarChar(10)
+
   Friend Friend[]
 
   @@map("friend_statuses")
 }
 
 model Comment {
-  id                  Int           @id @default(autoincrement())
-  content             String        @db.VarChar(5000)
-  createdAt           DateTime      @default(now()) @map("created_at")
-  updatedAt           DateTime      @map("updated_at")
-  deletedAt           DateTime      @map("deleted_at")
-  isDeleted           Boolean       @default(false) @map("is_deleted")
-  order               Int
-  likeCount           Int           @map("like_count")
-  comment             Comment       @relation("self_relation_comment", fields: [commentId], references: [id])
-  commentId           Int           @map("comment_id")
-  user                User          @relation(fields: [userId], references: [id])
-  userId              Int           @map("user_id")
-  post                Post          @relation(fields: [postId], references: [id])
-  postId              Int           @map("post_id")
+  id        Int      @id @default(autoincrement())
+  content   String   @db.VarChar(5000)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @map("updated_at")
+  deletedAt DateTime @map("deleted_at")
+  isDeleted Boolean  @default(false) @map("is_deleted")
+  order     Int
+  likeCount Int      @map("like_count")
+
+  comment   Comment @relation("self_relation_comment", fields: [commentId], references: [id])
+  commentId Int     @map("comment_id")
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int     @map("user_id")
+  post      Post    @relation(fields: [postId], references: [id])
+  postId    Int     @map("post_id")
+
   selfRelationComment Comment[]     @relation("self_relation_comment")
   commentLike         CommentLike[]
 
@@ -441,7 +477,8 @@ model PostAttachment {
   imageUrl   String @map("image_url") @db.VarChar(2000)
   media      Bytes  @db.Blob
   imageOrder Int    @map("image_order")
-  Post       Post[]
+
+  Post Post[]
 
   @@map("post_attachments")
 }
@@ -449,10 +486,11 @@ model PostAttachment {
 model PostLike {
   id            Int           @id @default(autoincrement())
   postLikeStyle PostLikeStyle @default(LIKE)
-  user          User          @relation(fields: [userId], references: [id])
-  userId        Int           @map("user_id")
-  post          Post          @relation(fields: [postId], references: [id])
-  postId        Int           @map("post_id")
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @map("user_id")
+  post   Post @relation(fields: [postId], references: [id])
+  postId Int  @map("post_id")
 
   @@map("post_likes")
 }
@@ -464,6 +502,7 @@ enum PostLikeStyle {
   LOVE
   INSIGHTFULL
   CURIOUS
+
 
   @@map("post_like_styles")
 }
