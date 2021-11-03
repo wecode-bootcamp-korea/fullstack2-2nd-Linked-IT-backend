@@ -1,5 +1,3 @@
-import employmentController from './employmentController';
-import profileController from './profileController';
-import mayKnowFriendController from './mayKnowFriendController';
+import userController from './userController';
 
-export { employmentController, profileController, mayKnowFriendController };
+export { userController };

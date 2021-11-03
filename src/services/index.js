@@ -1,5 +1,3 @@
-import employmentService from './employmentService';
-import profileService from './profileService';
-import mayKnowFriendService from './mayKnowFriendService';
+import userService from './userService';
 
-export { employmentService, profileService, mayKnowFriendService };
+export { userService };

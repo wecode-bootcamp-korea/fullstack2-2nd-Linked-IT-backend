@@ -1,12 +1,8 @@
 import express from 'express';
-import employmentRoute from './employmentRouter';
-import profileRoute from './profileRouter';
-import mayKnowFriendRoute from './mayKnowFriendRouter';
+import userRoute from './userRouter';
 
 const router = express.Router();
 
-router.use('/jobs', employmentRoute);
-router.use('/profile', profileRoute);
-router.use('/friend', mayKnowFriendRoute);
+router.use('/user', userRoute);
 
 export default router;
