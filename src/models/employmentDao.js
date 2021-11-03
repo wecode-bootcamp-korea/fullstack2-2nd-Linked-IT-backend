@@ -2,20 +2,32 @@ import { Prisma } from '.prisma/client';
 import prisma from '../../prisma';
 import { getTimeSincePosted } from '../utils/getTimeSincePosted';
 
-const result = async (filterWord) => {};
-result();
+const getJobListBySearch = async (query) => {
+  const keyword = `%${query.keyword}%`;
+  const companies = await prisma.$queryRaw`
+  SELECT
+    c.id,
+    c.english_name AS companyName,
+    c.location AS companyLocation,
+    ci.company_profile_url AS companyProfileImageUrl
+    FROM
+      companies c
+    LEFT JOIN
+      company_images ci
+    ON
+      ci.id = c.id
+    ${
+      query.keyword
+        ? Prisma.sql`WHERE c.english_name LIKE ${keyword}`
+        : Prisma.empty
+    }
+    ORDER BY c.id DESC
+      ;`;
+  return companies;
+};
 
 const getJobPostingList = async (filterWord) => {
   console.log(filterWord);
-  let date = await prisma.$queryRaw`
-    SELECT
-      ea.created_at
-    FROM
-      employment_announcements ea
-    WHERE
-      ea.created_at BETWEEN DATE_ADD(NOW(), INTERVAL -1 DAY) AND NOW()`;
-  console.log(date);
-
   let getPostCreatedAt = await prisma.$queryRaw`
     SELECT
       ea.created_at AS createdAt
@@ -87,6 +99,7 @@ const getJobPostingList = async (filterWord) => {
       c.english_name AS companyName,
       c.location AS companyLocation,
       wt.type AS workType, 
+      et.type AS employmentType,
       ea.time_since_posted AS timeSincePosted,
         (
           SELECT
@@ -114,7 +127,7 @@ const getJobPostingList = async (filterWord) => {
     LEFT JOIN
       employment_types et
     ON
-      et.id = ea.employment_type_id
+      et.id = ea.employment_type_id   
       ${
         filterWord.f_AL
           ? Prisma.sql`WHERE ea.is_easy_apply = ${filterWord.f_AL}`
@@ -122,11 +135,6 @@ const getJobPostingList = async (filterWord) => {
       }
       ${
         filterWord.f_WT
-          ? Prisma.sql`WHERE wt.id = ${filterWord.f_WT}`
-          : Prisma.empty
-      }
-      ${
-        filterWord.f_ET
           ? Prisma.sql`WHERE wt.id = ${filterWord.f_WT}`
           : Prisma.empty
       }
@@ -158,7 +166,8 @@ const getJobPostingList = async (filterWord) => {
     `;
 };
 
-const getJobPostingDetail = async () => {
+const getJobPostingDetail = async (jobPostingId) => {
+  console.log(jobPostingId);
   return await prisma.$queryRaw`
   SELECT
     ea.id AS jobPostingId,
@@ -191,11 +200,11 @@ const getJobPostingDetail = async () => {
       WHERE
       eaa.employment_announcement_id = ea.id
       ) AS companyDetailImages,
-    u.id AS AuthorId,  
-    u.first_name AS AuthorFirstName,
-    u.last_name AS AuthorLastName,
-    ui.user_profile_url AS AuthorProfileImageUrl,
-    p.position_name AS AuthorPosition,
+    u.id AS authorId,  
+    u.first_name AS authorFirstName,
+    u.last_name AS authorLastName,
+    ui.user_profile_url AS authorProfileImageUrl,
+    p.position_name AS authorPosition,
     ea.content AS jobPostingContent
       FROM
         users u
@@ -235,46 +244,13 @@ const getJobPostingDetail = async () => {
         employment_types et
       ON
         et.id = ea.employment_type_id
+      WHERE
+        ea.id = ${jobPostingId}
       `;
 };
 
-// const getJobPostingByFiltering = async (query) => {
-//   return await prisma.$queryRaw`
-//   SELECT
-//       c.id,
-//       c.english_name AS companyName,
-//       c.location AS companyLocation,
-//       c.introduction AS companySummary,
-//       c.number_of_employee AS TotalNumberOfEmployees,
-//       ci.company_profile_url AS companyProfileImageUrl,
-//       i.industry_type AS companyCategory,
-//       (
-//           SELECT
-//             COUNT(employment_announcement_id) AS count
-//           FROM
-//             applications a
-//           WHERE
-//             a.employment_announcement_id = ea.id
-//         ) AS countOfApply
-//     FROM
-//       companies c
-//     LEFT JOIN
-//       industries i
-//     ON
-//       i.id = c.industry_id
-//     LEFT JOIN
-//       company_images ci
-//     ON
-//       ci.id = c.id
-//     LEFT JOIN
-//       employment_announcements ea
-//     ON
-//       ea.id = c.id
-//   ;`;
-// };
-// 회사 리스트는 나중에 검색 창에서 재사용 목적으로 남겨 둠
-
 export default {
+  getJobListBySearch,
   getJobPostingList,
   getJobPostingDetail,
 };
