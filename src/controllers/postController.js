@@ -2,8 +2,7 @@ import { postService } from '../services';
 
 const readPost = async (req, res) => {
   try {
-    const postBody = req.body;
-    const posts = await postService.readPost(postBody);
+    const posts = await postService.readPost();
     res.status(200).send(posts);
   } catch (err) {
     console.log(err);
@@ -50,10 +49,31 @@ const deletePost = async (req, res) => {
   }
 };
 
+const getLikeByPost = async (req, res) => {
+  try {
+    const sumOfLike = await commentService.getLikeByPost();
+    res.status(200).send(sumOfLike);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const addLike = async (req, res) => {
+  try {
+    const userId = req.body;
+    const liked = await commentService.addLike(userId);
+    res.status(200).send(liked);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 export default {
   readPost,
   createPost,
   createHashtag,
   updatePost,
   deletePost,
+  getLikeByPost,
+  addLike,
 };

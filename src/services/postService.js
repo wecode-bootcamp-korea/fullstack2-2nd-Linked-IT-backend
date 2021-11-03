@@ -1,7 +1,7 @@
 import { postDao } from '../models';
 
-const readPost = async (postBody) => {
-  const post = await postDao.readPost(postBody);
+const readPost = async () => {
+  const post = await postDao.readPost();
   return post;
 };
 
@@ -10,10 +10,10 @@ const createPost = async (postBody) => {
   return post;
 };
 
-const createHashtag = async (postBody) => {
-  const post = await postDao.createHashtag(postBody);
-  return post;
-};
+// const createHashtag = async (postBody) => {
+//   const post = await postDao.createHashtag(postBody);
+//   return post;
+// };
 
 const updatePost = async (postBody) => {
   const post = await postDao.updatePost(postBody);
@@ -28,7 +28,7 @@ const deletePost = async (postBody) => {
 export default {
   readPost,
   createPost,
-  createHashtag,
   updatePost,
   deletePost,
+  // createHashtag,
 };

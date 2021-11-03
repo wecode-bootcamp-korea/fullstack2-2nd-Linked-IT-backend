@@ -3,17 +3,28 @@ import prisma from '../../prisma';
 
 const getSearchResult = async (query, limit) => {
   const keyword = `%${query.keyword}%`;
+  // if (!keyword) const result = keyword.replace(',');
   const users = await prisma.$queryRaw`
   SELECT
-    u.first_name AS userFirstName,
-    u.last_name AS userLastName,
-    ui.user_profile_url AS userProfileImageUrl
+    u.first_name AS firstName,
+    u.last_name AS lastName,
+    ui.user_profile_url AS userProfileUrl
+    p.position_name currentPosition,
+    ea.content AS jobPostingContent
   FROM
     users u
   LEFT JOIN
     user_images ui
   ON
     ui.id = u.id
+  LEFT JOIN
+    user_positions up
+  ON
+    up.user_id = u.id
+  LEFT JOIN
+    positions p
+  ON
+    p.id = up.position_id  
   ${
     query.keyword
       ? Prisma.sql`WHERE u.last_name LIKE ${keyword} OR u.first_name LIKE ${keyword}`

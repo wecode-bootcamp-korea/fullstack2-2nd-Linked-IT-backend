@@ -1,8 +1,9 @@
 import { Prisma } from '.prisma/client';
 import prisma from '../../prisma';
 
-const readPost = async (postBody) => {
-  const { userId } = postBody;
+const readPost = async () => {
+  const user_id = 1;
+
   const friendList = await prisma.$queryRaw`
   SELECT
     f.user_id
@@ -15,26 +16,60 @@ const readPost = async (postBody) => {
   WHERE
     f.friend_status_id = 4
   AND
-    u.id = ${userId}  
+    u.id = 1  
   `;
   const userFriendList = friendList.map((a) => a.user_id);
+  userFriendList.push(user_id);
+  console.log(friendList);
 
   const getFriendPost = await prisma.$queryRaw`
     SELECT
       p.id,
       p.content,
       p.created_at,
-      p.updated_at,
-      p.post_scope_of_public_id,
-      p.comment_scope_of_public_id,
-      p.post_attachment_id
-    FROM
-      posts p
-    LEFT JOIN
-      users u
-    ON
-      u.id = p.user_id
-    WHERE p.user_id IN (${Prisma.join(userFriendList)})  
+      p.post_scope_of_public_id AS postScopeOfPublic,
+      p.comment_scope_of_public_id AS commentScopeOfPublic,
+      u.id AS userId,
+      u.first_name AS firstName,
+      u.last_name AS lastName,
+      ui.user_profile_url AS userProfileUrl,
+      pc.headline AS userCurrentPosition,
+      (
+        SELECT
+            COUNT(c.id) AS count
+          FROM
+            comments c
+          WHERE
+            c.post_id = p.id
+        ) AS commentCount
+      FROM
+        posts p
+      LEFT JOIN
+        users u
+      ON
+        u.id = p.user_id
+      LEFT JOIN
+        comments c
+      ON
+        c.post_id = p.id
+      LEFT JOIN
+        user_images ui
+      ON
+        ui.id = u.id
+      LEFT JOIN
+        user_positions up
+      ON
+        up.user_id = u.id
+      LEFT JOIN
+        positions po
+      ON
+        po.id = up.position_id   
+      LEFT JOIN
+        position_careers pc
+      ON
+        pc.user_id = u.id       
+    WHERE p.user_id IN (${Prisma.join(userFriendList)})
+    ORDER BY p.created_at DESC
     ;`;
   return getFriendPost;
 };
