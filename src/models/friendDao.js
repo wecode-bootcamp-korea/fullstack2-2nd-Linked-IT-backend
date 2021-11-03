@@ -43,19 +43,20 @@ const getMyFriendList = async (userId) => {
          , m.major_name major
          , d.type degree
       from users u
-         , user_images i
-         , educations e
-         , colleges c
-         , majors m
-         , degrees d
-     where i.user_id = u.id
-       and e.user_id = u.id
-       and c.id = e.college_id
-       and m.id = e.major_id
-       and d.id = e.degree_id
-       and u.id in (select friend_id
+      left join user_images i
+             on i.user_id = u.id
+      left join educations e
+             on e.user_id = u.id
+      left join colleges c
+             on c.id = e.college_id
+      left join majors m
+             on m.id = e.major_id
+      left join degrees d
+             on d.id = e.degree_id
+     where u.id in (select friend_id
                       from friends
                      where user_id = ${userId})
+     order by u.last_name, u.first_name
   ;`;
 };
 
