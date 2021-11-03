@@ -4,4 +4,8 @@ const getFriend = async (userId) => {
   return await friendDao.getFriend(userId);
 };
 
-export default { getFriend };
+const getMyFriendList = async (userId) => {
+  return await friendDao.getMyFriendList(userId);
+};
+
+export default { getFriend, getMyFriendList };

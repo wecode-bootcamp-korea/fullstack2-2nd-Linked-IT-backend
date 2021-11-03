@@ -6,7 +6,7 @@ import routes from './src/routes';
 
 const app = express();
 
-app.use(morgan('dev'));
+// app.use(morgan('dev'));
 
 app.use(cors());
 app.use(express.json());
@@ -23,7 +23,7 @@ app.use((err, req, res, next) => {
   if (err) {
     console.error('global error handler', err);
     const { status, message } = err;
-    res.send(status || 500).json(message);
+    res.status(status || 500).json(message);
   }
 });
 

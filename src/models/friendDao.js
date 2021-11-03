@@ -33,4 +33,30 @@ const getFriend = async (userId) => {
   return filterList;
 };
 
-export default { getFriend };
+const getMyFriendList = async (userId) => {
+  return await prisma.$queryRaw`
+    select u.id
+         , u.last_name lastName
+         , u.first_name firstName
+         , i.user_profile_url userProfileUrl
+         , c.college_name school
+         , m.major_name major
+         , d.type degree
+      from users u
+         , user_images i
+         , educations e
+         , colleges c
+         , majors m
+         , degrees d
+     where i.user_id = u.id
+       and e.user_id = u.id
+       and c.id = e.college_id
+       and m.id = e.major_id
+       and d.id = e.degree_id
+       and u.id in (select friend_id
+                      from friends
+                     where user_id = ${userId})
+  ;`;
+};
+
+export default { getFriend, getMyFriendList };

@@ -10,4 +10,14 @@ const getFriend = async (req, res) => {
   }
 };
 
-export default { getFriend };
+const getMyFriendList = async (req, res) => {
+  try {
+    const { userId } = req.query;
+    const myFriendList = await friendService.getMyFriendList(userId);
+    res.status(200).json(myFriendList);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export default { getFriend, getMyFriendList };
