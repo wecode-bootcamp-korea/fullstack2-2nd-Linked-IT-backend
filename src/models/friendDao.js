@@ -10,30 +10,50 @@ const getTotalFriendCount = async (userId) => {
   return totalFriendCountObj.count;
 };
 
-const getMyFriendList = async (userId) => {
+const getFriendListByStatus = async (userId, friendStatusId) => {
+  let friendList = [];
+  // 4: 친구, 2: 친구 요청 보냄
+  if (friendStatusId == 4 || friendStatusId == 2) {
+    friendList = await prisma.$queryRaw`
+      SELECT friend_id userId
+        FROM friends
+       WHERE user_id = ${userId}
+         AND friend_status_id = ${friendStatusId}
+    ;`;
+  }
+  // 친구 요청 받음
+  else {
+    friendList = await prisma.$queryRaw`
+      SELECT user_id userId
+        FROM friends
+       WHERE friend_id = ${userId}
+         AND friend_status_id = 2
+    ;`;
+  }
+  friendList = friendList.map((el) => el.userId);
+
+  // 친구 정보 조회
   return await prisma.$queryRaw`
-    SELECT u.id
-         , u.last_name lastName
-         , u.first_name firstName
-         , i.user_profile_url userProfileUrl
-         , c.college_name school
-         , m.major_name major
-         , d.type degree
-      FROM users u
-      LEFT JOIN user_images i
-             ON i.user_id = u.id
-      LEFT JOIN educations e
-             ON e.user_id = u.id
-      LEFT JOIN colleges c
-             ON c.id = e.college_id
-      LEFT JOIN majors m
-             ON m.id = e.major_id
-      LEFT JOIN degrees d
-             ON d.id = e.degree_id
-     WHERE u.id IN (SELECT friend_id
-                      FROM friends
-                     WHERE user_id = ${userId})
-     ORDER BY u.last_name, u.first_name
+  SELECT u.id userId
+      , u.last_name lastName
+      , u.first_name firstName
+      , i.user_profile_url userProfileUrl
+      , c.college_name collegeName
+      , m.major_name majorName
+      , d.type degreeType
+  FROM users u
+  LEFT JOIN user_images i
+        ON i.user_id = u.id
+  LEFT JOIN educations e
+        ON e.user_id = u.id
+  LEFT JOIN colleges c
+        ON c.id = e.college_id
+  LEFT JOIN majors m
+        ON m.id = e.major_id
+  LEFT JOIN degrees d
+        ON d.id = e.degree_id
+  WHERE u.id IN (${Prisma.join(friendList)})
+  ORDER BY u.last_name, u.first_name
   ;`;
 };
 
@@ -73,7 +93,7 @@ const addFriend = async (userInfo) => {
   const { userId, friendId } = userInfo;
   await prisma.$queryRaw`
     INSERT INTO friends (user_id, friend_id, friend_status_id)
-    VALUES (${userId}, ${friendId}, 4)
+    VALUES (${userId}, ${friendId}, 2)
   ;`;
 
   const [friendCountObj] = await prisma.$queryRaw`
@@ -82,7 +102,7 @@ const addFriend = async (userInfo) => {
      WHERE user_id = ${userId}
        AND friend_id = ${friendId}
   ;`;
-  return friendCountObj.friendId;
+  return friendCountObj.friendId.toString();
 };
 
 const deleteFriend = async (userInfo) => {
@@ -97,7 +117,7 @@ const deleteFriend = async (userInfo) => {
 
 export default {
   getTotalFriendCount,
-  getMyFriendList,
+  getFriendListByStatus,
   getFriend,
   addFriend,
   deleteFriend,

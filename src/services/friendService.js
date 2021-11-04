@@ -4,8 +4,8 @@ const getTotalFriendCount = async (userId) => {
   return await friendDao.getTotalFriendCount(userId);
 };
 
-const getMyFriendList = async (userId) => {
-  return await friendDao.getMyFriendList(userId);
+const getFriendListByStatus = async (userId, friendStatusId) => {
+  return await friendDao.getFriendListByStatus(userId, friendStatusId);
 };
 const getFriend = async (userId) => {
   return await friendDao.getFriend(userId);
@@ -21,7 +21,7 @@ const deleteFriend = async (userInfo) => {
 
 export default {
   getTotalFriendCount,
-  getMyFriendList,
+  getFriendListByStatus,
   getFriend,
   addFriend,
   deleteFriend,

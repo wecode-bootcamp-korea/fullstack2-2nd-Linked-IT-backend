@@ -10,10 +10,13 @@ const getTotalFriendCount = async (req, res) => {
   }
 };
 
-const getMyFriendList = async (req, res) => {
+const getFriendListByStatus = async (req, res) => {
   try {
-    const { userId } = req.query;
-    const myFriendList = await friendService.getMyFriendList(userId);
+    const { userId, friendStatusId } = req.query;
+    const myFriendList = await friendService.getFriendListByStatus(
+      userId,
+      friendStatusId
+    );
     res.status(200).json(myFriendList);
   } catch (error) {
     console.log(error);
@@ -50,7 +53,7 @@ const deleteFriend = async (req, res) => {
 
 export default {
   getTotalFriendCount,
-  getMyFriendList,
+  getFriendListByStatus,
   getFriend,
   addFriend,
   deleteFriend,
