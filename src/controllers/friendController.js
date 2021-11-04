@@ -30,4 +30,28 @@ const getFriend = async (req, res) => {
   }
 };
 
-export default { getTotalFriendCount, getMyFriendList, getFriend };
+const addFriend = async (req, res) => {
+  try {
+    const friendId = await friendService.addFriend(req.body);
+    res.status(201).json({ friendId });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const deleteFriend = async (req, res) => {
+  try {
+    const friendId = await friendService.deleteFriend(req.body);
+    res.status(200).json({ friendId });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export default {
+  getTotalFriendCount,
+  getMyFriendList,
+  getFriend,
+  addFriend,
+  deleteFriend,
+};

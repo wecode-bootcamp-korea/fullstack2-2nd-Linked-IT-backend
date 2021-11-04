@@ -3,8 +3,11 @@ import { friendController } from '../controllers';
 
 const router = express.Router();
 
-router.get('/:userId', friendController.getMyFriendList);
-router.get('/:userId/totalCount', friendController.getTotalFriendCount);
-router.get('/:userId/acquaintance', friendController.getFriend);
+router
+  .get('/:userId', friendController.getMyFriendList)
+  .get('/:userId/totalCount', friendController.getTotalFriendCount)
+  .get('/:userId/acquaintance', friendController.getFriend)
+  .post('/', friendController.addFriend)
+  .delete('/', friendController.deleteFriend);
 
 export default router;

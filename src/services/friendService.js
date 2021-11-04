@@ -11,4 +11,18 @@ const getFriend = async (userId) => {
   return await friendDao.getFriend(userId);
 };
 
-export default { getTotalFriendCount, getMyFriendList, getFriend };
+const addFriend = async (userInfo) => {
+  return await friendDao.addFriend(userInfo);
+};
+
+const deleteFriend = async (userInfo) => {
+  return await friendDao.deleteFriend(userInfo);
+};
+
+export default {
+  getTotalFriendCount,
+  getMyFriendList,
+  getFriend,
+  addFriend,
+  deleteFriend,
+};
