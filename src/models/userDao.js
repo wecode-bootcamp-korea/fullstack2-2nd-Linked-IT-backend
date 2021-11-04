@@ -114,9 +114,7 @@ const getPositionCareer = async (userId) => {
             , pc.start_year               startYear
             , pc.end_month                endMonth
             , pc.end_year                 endYear
-            , countries.country_name      country
-            , states.state_name           state
-            , cities.city_name            city
+            , companies.location          region
             , i.industry_type             industry
             , pc.headline                 headline
             , pc.description
@@ -142,12 +140,6 @@ const getPositionCareer = async (userId) => {
           ON  pc.employment_type_id = et.id
    LEFT JOIN  introductions intro
           ON  intro.position_career_id = pc.id
-   LEFT JOIN  countries
-          ON  intro.country_id = countries.id
-   LEFT JOIN  states
-          ON  countries.id = states.country_id
-   LEFT JOIN  cities
-          ON  states.id = cities.state_id
        WHERE  pc.user_id = ${userId}
     ;
   `;
@@ -209,9 +201,9 @@ const createPositionCareer = async (userId, positionCareerData) => {
     endYear,
     headline,
     description,
-    positionId,
-    companyId,
-    industryId,
+    position,
+    companyName,
+    industry,
     employmentTypeId,
     scopeOfPublicId,
   } = positionCareerData;
@@ -237,9 +229,15 @@ const createPositionCareer = async (userId, positionCareerData) => {
                                 , ${endYear}
                                 , ${headline}
                                 , ${description}
-                                , ${positionId}
-                                , ${companyId}
-                                , ${industryId}
+                                , (SELECT positions.id
+                                     FROM positions
+                                    WHERE positions.position_name LIKE ${position})
+                                , (SELECT companies.id
+                                     FROM companies
+                                    WHERE companies.korean_name LIKE ${companyName})
+                                , (SELECT industries.id
+                                     FROM industries
+                                    WHERE industries.industry_type LIKE ${industry})
                                 , ${userId}
                                 , ${employmentTypeId}
                                 , ${scopeOfPublicId})
@@ -259,11 +257,10 @@ const updatePositionCareer = async (
     startYear,
     endMonth,
     endYear,
-    headline,
     description,
     positionId,
-    companyId,
-    industryId,
+    companyName,
+    industry,
     employmentTypeId,
     scopeOfPublicId,
   } = positionCareerData;
@@ -275,11 +272,14 @@ const updatePositionCareer = async (
           , start_year              = ${startYear}
           , end_month               = ${endMonth}
           , end_year                = ${endYear}
-          , headline                = ${headline}
           , description             = ${description}
           , position_id             = ${positionId}
-          , company_id              = ${companyId}
-          , industry_id             = ${industryId}
+          , company_id              = (SELECT companies.id
+                                         FROM companies
+                                        WHERE companies.korean_name LIKE ${companyName})
+          , industry_id             = (SELECT industries.id
+                                         FROM industries
+                                        WHERE industries.industry_type LIKE ${industry})
           , user_id                 = ${userId}
           , employment_type_id      = ${employmentTypeId}
           , scope_of_public_id      = ${scopeOfPublicId}

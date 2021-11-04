@@ -218,7 +218,7 @@ model PositionCareer {
   startYear            Int?    @map("start_year")
   endMonth             Int?    @map("end_month")
   endYear              Int?    @map("end_year")
-  headline             String  @db.VarChar(100)
+  headline             String? @db.VarChar(100)
   description          String? @db.VarChar(2000)
 
   position         Position       @relation(fields: [positionId], references: [id])
@@ -390,7 +390,7 @@ model Post {
   postScopeOfPublic      ScopeOfPublic  @relation("post_scope", fields: [postScopeOfPublicId], references: [id])
   postScopeOfPublicId    Int            @map("post_scope_of_public_id")
   commentScopeOfPublic   ScopeOfPublic  @relation("comment_scope", fields: [commentScopeOfPublicId], references: [id])
-  commentScopeOfPublicId Int            @map("comment_scope_of_public")
+  commentScopeOfPublicId Int            @map("comment_scope_of_public_id")
   user                   User           @relation(fields: [userId], references: [id])
   userId                 Int            @map("user_id")
   postAttachment         PostAttachment @relation(fields: [postAttachmentId], references: [id])
