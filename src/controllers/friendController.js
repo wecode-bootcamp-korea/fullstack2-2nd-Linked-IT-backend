@@ -51,10 +51,20 @@ const deleteFriend = async (req, res) => {
   }
 };
 
+const updateFriend = async (req, res) => {
+  try {
+    const friendId = await friendService.updateFriend(req.body);
+    res.status(200).json({ friendId });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export default {
   getTotalFriendCount,
   getFriendListByStatus,
   getFriend,
   addFriend,
   deleteFriend,
+  updateFriend,
 };

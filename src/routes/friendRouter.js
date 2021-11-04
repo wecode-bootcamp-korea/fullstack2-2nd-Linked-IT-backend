@@ -8,6 +8,7 @@ router
   .get('/:userId/totalCount', friendController.getTotalFriendCount)
   .get('/:userId/acquaintance', friendController.getFriend)
   .post('/', friendController.addFriend)
-  .delete('/', friendController.deleteFriend);
+  .delete('/', friendController.deleteFriend)
+  .patch('/', friendController.updateFriend);
 
 export default router;

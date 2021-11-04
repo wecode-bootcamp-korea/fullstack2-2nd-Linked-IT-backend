@@ -6,6 +6,7 @@ const getTotalFriendCount = async (userId) => {
     SELECT COUNT(1) count
       FROM friends
      WHERE user_id = ${userId}
+       AND friend_status_id = 4
   ;`;
   return totalFriendCountObj.count;
 };
@@ -93,7 +94,7 @@ const addFriend = async (userInfo) => {
   const { userId, friendId } = userInfo;
   await prisma.$queryRaw`
     INSERT INTO friends (user_id, friend_id, friend_status_id)
-    VALUES (${userId}, ${friendId}, 2)
+    VALUES (${userId}, ${friendId}, 4)
   ;`;
 
   const [friendCountObj] = await prisma.$queryRaw`
@@ -115,10 +116,26 @@ const deleteFriend = async (userInfo) => {
   return friendId;
 };
 
+const updateFriend = async (userInfo) => {
+  const { userId, friendId, friendStatusId } = userInfo;
+  await prisma.$queryRaw`
+    UPDATE friends
+       SET friend_status_id = ${friendStatusId}
+     WHERE user_id = ${userId}
+       AND friend_id = ${friendId}
+  ;`;
+
+  const newUserInfo = { userId: friendId, friendId: userId };
+  await addFriend(newUserInfo);
+
+  return userId;
+};
+
 export default {
   getTotalFriendCount,
   getFriendListByStatus,
   getFriend,
   addFriend,
   deleteFriend,
+  updateFriend,
 };

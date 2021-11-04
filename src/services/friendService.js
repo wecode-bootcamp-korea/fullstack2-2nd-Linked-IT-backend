@@ -19,10 +19,15 @@ const deleteFriend = async (userInfo) => {
   return await friendDao.deleteFriend(userInfo);
 };
 
+const updateFriend = async (userInfo) => {
+  return await friendDao.updateFriend(userInfo);
+};
+
 export default {
   getTotalFriendCount,
   getFriendListByStatus,
   getFriend,
   addFriend,
   deleteFriend,
+  updateFriend,
 };
