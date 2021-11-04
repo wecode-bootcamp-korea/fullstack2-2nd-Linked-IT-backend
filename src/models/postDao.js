@@ -161,8 +161,6 @@ const getLikeByPost = async () => {
     users u
     ON
     u.id = pl.user_id
-    WHERE
-    p.user_id IN (${Prisma.join(userFriendList)})
     ORDER BY p.created_at DESC
     `;
 };

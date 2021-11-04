@@ -215,7 +215,7 @@ const getJobPostingDetail = async (jobPostingId) => {
       ) AS applicantCount,
     ea.is_easy_apply AS isEasyApply,
     et.type AS employmentType,
-    ea.headline AS description,
+    ea.content AS description,
     ea.salary_information AS salaryRange,
     c.id AS companyId,
     ci.company_profile_url AS companyProfileImageUrl,
@@ -279,7 +279,7 @@ const getJobPostingDetail = async (jobPostingId) => {
         ea.id = ${jobPostingId}
       `;
   const [result] = jobPostingDetail;
-  result;
+  return result;
 };
 
 export default {

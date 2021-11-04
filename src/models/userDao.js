@@ -19,7 +19,7 @@ const getUserListBySearch = async (query, limit) => {
           users u
         ${
           query.keyword
-            ? Prisma.sql`WHERE u.last_name LIKE ${keyword} OR u.first_name LIKE ${keyword} OR pc.headline LIKE ${keyword}`
+            ? Prisma.sql`WHERE pc.headline LIKE ${keyword} OR u.last_name LIKE ${keyword} OR u.first_name LIKE ${keyword}`
             : Prisma.empty
         }
       ) AS userCount
@@ -45,7 +45,6 @@ const getUserListBySearch = async (query, limit) => {
     companies c
   ON
     c.id = u.id  
-   
   ${
     query.keyword
       ? Prisma.sql`WHERE u.last_name LIKE ${keyword} OR u.first_name LIKE ${keyword} OR pc.headline LIKE ${keyword}`
