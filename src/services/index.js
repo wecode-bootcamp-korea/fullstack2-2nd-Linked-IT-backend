@@ -4,6 +4,7 @@ import companyService from './companyService';
 import searchService from './searchService';
 import postService from './postService';
 import commentService from './commentService';
+import friendService from './friendService';
 
 export {
   employmentService,
@@ -12,4 +13,5 @@ export {
   searchService,
   postService,
   commentService,
+  friendService,
 };

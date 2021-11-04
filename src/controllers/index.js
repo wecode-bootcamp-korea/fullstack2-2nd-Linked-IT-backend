@@ -4,6 +4,7 @@ import userController from './userController';
 import companyController from './companyController';
 import postController from './postController';
 import commentController from './commentController';
+import friendController from './friendController';
 
 export {
   employmentController,
@@ -12,4 +13,5 @@ export {
   companyController,
   postController,
   commentController,
+  friendController,
 };
