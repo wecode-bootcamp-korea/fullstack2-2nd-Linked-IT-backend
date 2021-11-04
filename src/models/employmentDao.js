@@ -119,7 +119,7 @@ const getJobPostingList = async (filterWord) => {
     }
   }
 
-  const jobPostingList = await prisma.$queryRaw`
+  return await prisma.$queryRaw`
    SELECT
       ea.id AS jobPostingId,
       ci.company_profile_url AS companyProfileImgUrl,
@@ -193,9 +193,6 @@ const getJobPostingList = async (filterWord) => {
           : Prisma.empty
       }
     `;
-
-  const [result] = jobPostingList;
-  return result;
 };
 
 const getJobPostingDetail = async (jobPostingId) => {
