@@ -2,40 +2,66 @@ import prisma from '../../prisma';
 
 const getUser = async (userId) => {
   return await prisma.$queryRaw`
-      SELECT  u.first_name             firstName
-            , u.last_name             lastName
+      SELECT  u.id                       userId
+            , u.first_name                firstName
+            , u.last_name                lastName
+            , intro.one_line_profile      oneLineProfile
+            , countries.country_name     country
+            , countries.sort_name        countrySortName
+            , states.state_name          state
+            , cities.city_name           city
+            , positions.position_name    prosition
+            , industries.industry_type   industry
+            , ci.company_profile_url      companyLogo
+            , companies.korean_name      companyName
+            , companies.english_name     companyEngName
+            , colleges.college_name      schoolName
+            , countries.phone_code       phone
             , u.email
             , u.provider
-            , u.sns_id                snsId
-            , ui.user_profile_url      userProfileImageUrl
-            , ui.user_background_url  userBacgroundImageUrl
-            , cinfo.profile_url        profileUrl
-            , cinfo.phone_number      phoneNumber
-            , c.phone_code            phoneCode
-            , c.country_name          countryName
-            , c.sort_name             countrySortName
-            , states.state_name       stateName
-            , cities.city_name        cityName
-            , cinfo.phone_type        phoneType
+            , u.sns_id                   snsId
+            , ui.user_profile_url         userProfileUrl
+            , ui.user_background_url     backgroundImg
+            , cinfo.profile_url           profileUrl
+            , cinfo.phone_number         phoneNumber
+            , states.state_name          stateName
+            , cities.city_name           cityName
+            , cinfo.phone_type           phoneType
             , cinfo.address
-            , cinfo.birth_year        birthYear
-            , cinfo.birth_month       birthMonth
-            , cinfo.birth_day         birthDay
-            , cinfo.user_id           userId
-            , sop.type                scopeOfPublicType
+            , cinfo.birth_year           birthYear
+            , cinfo.birth_month          birthMonth
+            , cinfo.birth_day            birthDay
+            , cinfo.user_id              userId
+            , sop.type                   scopeOfPublicType
         FROM  users u
    LEFT JOIN  user_images ui
           ON  u.id = ui.user_id
    LEFT JOIN  contact_informations cinfo
           ON  u.id = cinfo.user_id
-   LEFT JOIN  countries c
-          ON  u.id = c.id
+   LEFT JOIN  position_careers pc
+          ON  pc.user_id = u.id
+   LEFT JOIN  introductions intro
+          ON  intro.position_career_id = pc.id
+   LEFT JOIN  countries
+          ON  intro.country_id = countries.id
    LEFT JOIN  states
-          ON  c.id = states.country_id
+          ON  countries.id = states.country_id
    LEFT JOIN  cities
           ON  states.id = cities.state_id
+   LEFT JOIN  positions
+          ON  pc.position_id = positions.id
+   LEFT JOIN  industries
+          ON  pc.industry_id = industries.id
    LEFT JOIN  scope_of_publics sop
           ON  cinfo.scope_of_public_id = sop.id
+   LEFT JOIN  educations e
+          ON  e.user_id = u.id
+   LEFT JOIN  colleges
+          ON  e.college_id = colleges.id
+   LEFT JOIN  companies
+          ON  pc.company_id = companies.id
+   LEFT JOIN  company_images ci
+          ON  ci.company_id = companies.id
        WHERE  u.id = ${userId}
     ;
   `;
@@ -43,22 +69,22 @@ const getUser = async (userId) => {
 
 const getEducation = async (userId) => {
   return await prisma.$queryRaw`
-    SELECT  u.id
+    SELECT  u.id                userId
           , u.first_name         firstName
           , u.last_name         lastName
+          , c.college_name      schoolName
+          , c.location          schoolLocation
+          , d.type              degree
+          , m.major_name        major
+          , e.grade             gpa
           , e.admission_month   admissionMonth
           , e.admission_year    admissionYear
           , e.graduation_month  graduationMonth
           , e.graduation_year   graduationYear
-          , e.grade
           , e.activity
           , e.description
-          , c.college_name      collegeName
-          , c.location          collegeLocation
-          , d.type              degreeType
-          , m.major_name        majorName
-      FROM  educations e
- LEFT JOIN  users u
+      FROM  users u
+ LEFT JOIN  educations e
         ON  e.user_id = u.id
  LEFT JOIN  colleges c
         ON  e.college_id = c.id
@@ -74,29 +100,31 @@ const getEducation = async (userId) => {
 const getPositionCareer = async (userId) => {
   return await prisma.$queryRaw`
       SELECT  u.id                        userId
-            , pc.id                       positionCareerId
             , u.first_name                 firstName
             , u.last_name                 lastName
-            , pc.is_current_position      isCurrentPosition
-            , pc.is_end_current_position  isEndCurrentPosition
-            , pc.headline                 careerHeadline
-            , pc.description              careerDescription
-            , pc.start_month              careerStartMonth
-            , pc.start_year               careerStartYear
-            , pc.end_month                careerEndMonth
-            , pc.end_year                 careerEndYear
-            , c.korean_name               companyKoreanName
-            , c.english_name              companyEnglishName
-            , c.location                  companyLocation
-            , ci.company_profile_url       companyProfileImageUrl
-            , i.industry_type             industryType
-            , p.position_name             positionName
+            , ci.company_profile_url       companyLogo
+            , p.position_name             position
+            , companies.korean_name       companyName
+            , companies.english_name      companyEngName
             , et.type                     employmentType
-        FROM  position_careers pc
-   LEFT JOIN  users u
+            , pc.start_month              startMonth
+            , pc.start_year               startYear
+            , pc.end_month                endMonth
+            , pc.end_year                 endYear
+            , countries.country_name      country
+            , states.state_name           state
+            , cities.city_name            city
+            , i.industry_type             industry
+            , pc.headline                 headline
+            , pc.description
+            , pc.is_current_position      isWorkingNow
+            , pc.is_end_current_position  isEndWorking
+            , companies.location          location
+        FROM  users u
+   LEFT JOIN  position_careers pc
           ON  u.id = pc.user_id
-   LEFT JOIN  companies c
-          ON  c.id = pc.company_id
+   LEFT JOIN  companies
+          ON  companies.id = pc.company_id
    LEFT JOIN  employment_announcements ea
           ON  ea.user_id = u.id
    LEFT JOIN  company_images ci
@@ -104,12 +132,20 @@ const getPositionCareer = async (userId) => {
    LEFT JOIN  industries i
           ON  pc.industry_id = i.id
    LEFT JOIN  user_positions up
-          ON  u.id = up.id
+          ON  u.id = up.user_id
    LEFT JOIN  positions p
           ON  up.position_id = p.id
    LEFT JOIN  employment_types et
           ON  pc.employment_type_id = et.id
-       WHERE  u.id = ${userId}
+   LEFT JOIN  introductions intro
+          ON  intro.position_career_id = pc.id
+   LEFT JOIN  countries
+          ON  intro.country_id = countries.id
+   LEFT JOIN  states
+          ON  countries.id = states.country_id
+   LEFT JOIN  cities
+          ON  states.id = cities.state_id
+       WHERE  pc.user_id = ${userId}
     ;
   `;
 };
