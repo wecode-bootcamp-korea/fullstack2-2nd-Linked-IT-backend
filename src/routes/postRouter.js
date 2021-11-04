@@ -8,6 +8,7 @@ router.post('/hashtag', postController.createHashtag);
 router.patch('/update', postController.updatePost);
 router.delete('/delete', postController.deletePost);
 router.get('/getLike', postController.getLikeByPost);
-router.post('/AddLike', postController.addLike);
+router.post('/addLike', postController.addLike);
+router.delete('/cancelLike', postController.cancelLike);
 
 export default router;

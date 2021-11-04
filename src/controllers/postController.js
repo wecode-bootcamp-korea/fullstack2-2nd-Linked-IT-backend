@@ -51,7 +51,7 @@ const deletePost = async (req, res) => {
 
 const getLikeByPost = async (req, res) => {
   try {
-    const sumOfLike = await commentService.getLikeByPost();
+    const sumOfLike = await postService.getLikeByPost();
     res.status(200).send(sumOfLike);
   } catch (err) {
     console.log(err);
@@ -60,9 +60,19 @@ const getLikeByPost = async (req, res) => {
 
 const addLike = async (req, res) => {
   try {
-    const userId = req.body;
-    const liked = await commentService.addLike(userId);
+    const likeBody = req.body;
+    const liked = await postService.addLike(likeBody);
     res.status(200).send(liked);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const cancelLike = async (req, res) => {
+  try {
+    const likeBody = req.body;
+    const cancelLike = await postService.cancelLike(likeBody);
+    res.status(200).send(cancelLike);
   } catch (err) {
     console.log(err);
   }
@@ -76,4 +86,5 @@ export default {
   deletePost,
   getLikeByPost,
   addLike,
+  cancelLike,
 };

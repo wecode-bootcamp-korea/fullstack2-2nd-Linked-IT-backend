@@ -5,23 +5,52 @@ import { getTimeSincePosted } from '../utils/getTimeSincePosted';
 const getJobListBySearch = async (query) => {
   const keyword = `%${query.keyword}%`;
   const companies = await prisma.$queryRaw`
-  SELECT
-    c.id,
-    c.english_name AS companyName,
-    c.location AS companyLocation,
-    ci.company_profile_url AS companyProfileImageUrl
-    FROM
-      companies c
+    SELECT  
+      ea.id AS jobPostingId,
+      ci.company_profile_url AS companyProfileImgUrl,
+      ea.headline AS jobPostingTitle,
+      c.english_name AS companyName,
+      c.location AS companyLocation,
+      wt.type AS workType, 
+      et.type AS employmentType,
+      ea.time_since_posted AS timeSincePosted,
+        (
+        SELECT
+          COUNT(ea.id) AS count
+        FROM
+          employment_announcements ea
+        ${
+          query.keyword
+            ? Prisma.sql`WHERE ea.headline LIKE ${keyword}`
+            : Prisma.empty
+        }
+        ) AS jobListCount,
+      ea.is_easy_apply AS isEasyApply
+    FROM 
+      employment_announcements ea
     LEFT JOIN
       company_images ci
     ON
+      ea.id = ci.id
+    LEFT JOIN
+      work_types wt 
+    ON
+      ea.work_type_id = wt.id
+    LEFT JOIN
+      companies c
+    ON
       ci.id = c.id
+    LEFT JOIN
+      employment_types et
+    ON
+      et.id = ea.employment_type_id   
     ${
       query.keyword
-        ? Prisma.sql`WHERE c.english_name LIKE ${keyword}`
+        ? Prisma.sql`WHERE ea.headline LIKE ${keyword}`
         : Prisma.empty
     }
     ORDER BY c.id DESC
+    LIMIT 3
       ;`;
   return companies;
 };

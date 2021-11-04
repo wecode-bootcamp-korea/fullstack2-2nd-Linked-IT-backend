@@ -7,7 +7,8 @@ router.post('/create', commentController.createCommentOfPost);
 // router.post('/createSub', commentController.createSubCommentOfPost);
 router.patch('/update', commentController.updateCommentOfPost);
 router.delete('/delete', commentController.deleteCommentOfPost);
-router.get('/get', commentController.getLikeByComment);
-router.patch('/beLike', commentController.addLike);
+router.get('/getLike', commentController.getLikeByComment);
+router.post('/addLike', commentController.addLike);
+router.delete('/cancelLike', commentController.cancelLike);
 
 export default router;

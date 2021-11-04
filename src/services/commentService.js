@@ -25,13 +25,18 @@ const deleteCommentOfPost = async (commentBody) => {
   return deletedComment;
 };
 
-const getLikeByPost = async () => {
-  const sumOfLike = await commentDao.getLikeByPost();
+const getLikeByComment = async () => {
+  const sumOfLike = await commentDao.getLikeByComment();
   return sumOfLike;
 };
 
 const addLike = async (likeBody) => {
   const liked = await commentDao.addLike(likeBody);
+  return liked;
+};
+
+const cancelLike = async (likeBody) => {
+  const liked = await commentDao.cancelLike(likeBody);
   return liked;
 };
 
@@ -41,6 +46,7 @@ export default {
   updateCommentOfPost,
   deleteCommentOfPost,
   // createSubCommentOfPost,
-  getLikeByPost,
+  getLikeByComment,
   addLike,
+  cancelLike,
 };

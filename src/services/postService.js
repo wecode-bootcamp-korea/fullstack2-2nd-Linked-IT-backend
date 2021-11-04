@@ -25,10 +25,28 @@ const deletePost = async (postBody) => {
   return post;
 };
 
+const getLikeByPost = async () => {
+  const sumOfLike = await postDao.getLikeByPost();
+  return sumOfLike;
+};
+
+const addLike = async (likeBody) => {
+  const liked = await postDao.addLike(likeBody);
+  return liked;
+};
+
+const cancelLike = async (likeBody) => {
+  const liked = await postDao.cancelLike(likeBody);
+  return liked;
+};
+
 export default {
   readPost,
   createPost,
   updatePost,
   deletePost,
+  getLikeByPost,
+  addLike,
+  cancelLike,
   // createHashtag,
 };

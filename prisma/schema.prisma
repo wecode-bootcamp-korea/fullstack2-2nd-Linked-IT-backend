@@ -381,7 +381,6 @@ model Post {
   id        Int       @id @default(autoincrement())
   content   String?   @db.VarChar(5000)
   createdAt DateTime  @default(now()) @map("created_at")
-  // null 값으로 다 바꿨어요...ㅠ
   updatedAt DateTime? @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
   isDeleted Boolean?  @default(false) @map("is_deleted")
@@ -422,7 +421,6 @@ model Company {
 
 model Hashtag {
   id    Int     @id @default(autoincrement())
-  // nullable + unique - String 컬럼
   title String? @unique @db.VarChar(30)
 
   PostHashtag PostHashtag[]
@@ -460,7 +458,6 @@ model Comment {
   isDeleted Boolean?  @default(false) @map("is_deleted")
   order     Int?
   likeCount Int?      @map("like_count")
-  //updatedAt, deletedAt, isDeleted, order, likeCount , comment, commentId nullable 수정
   comment   Comment?  @relation("self_relation_comment", fields: [commentId], references: [id])
   commentId Int?      @map("comment_id")
   user      User      @relation(fields: [userId], references: [id])
@@ -485,11 +482,10 @@ model Follow {
 }
 
 model PostAttachment {
-  id       Int     @id @default(autoincrement())
-  // nullable - String, Bytes 수정
-  imageUrl String? @map("image_url") @db.VarChar(2000)
-  media    Bytes?  @db.Blob
-  // imageOrder Int?    @map("image_order")
+  id         Int     @id @default(autoincrement())
+  imageUrl   String? @map("image_url") @db.VarChar(2000)
+  media      Bytes?  @db.Blob
+  imageOrder Int?    @map("image_order")
 
   Post Post[]
 
@@ -499,13 +495,15 @@ model PostAttachment {
 model PostLike {
   id Int @id @default(autoincrement())
 
-  postLikeStyle   PostLikeStyle @relation(fields: [postLikeStyleId], references: [id])
-  postLikeStyleId Int           @unique @map("post_like_style_id")
-  user            User          @relation(fields: [userId], references: [id])
-  userId          Int           @map("user_id")
-  post            Post          @relation(fields: [postId], references: [id])
-  postId          Int           @map("post_id")
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @map("user_id")
+  post   Post @relation(fields: [postId], references: [id])
+  postId Int  @map("post_id")
 
+  PostLikeStyle   PostLikeStyle @relation(fields: [postLikeStyleId], references: [id])
+  postLikeStyleId Int           @map("post_like_style_id")
+
+  @@unique([userId, postId, postLikeStyleId])
   @@map("post_likes")
 }
 
@@ -513,7 +511,7 @@ model PostLikeStyle {
   id   Int    @id @default(autoincrement())
   type String @db.VarChar(100)
 
-  PostLike PostLike?
 
+  PostLike PostLike[]
   @@map("post_like_styles")
 }

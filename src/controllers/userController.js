@@ -13,12 +13,7 @@ const getUserListBySearch = async (req, res) => {
 const getAllUserListByClick = async (req, res) => {
   try {
     const query = req.query;
-    const { limit, offset } = req.query;
-    const userAllList = await userService.getAllUserListByClick(
-      query,
-      limit,
-      offset
-    );
+    const userAllList = await userService.getAllUserListByClick(query);
     res.status(200).send(userAllList);
   } catch (err) {
     console.log(err);

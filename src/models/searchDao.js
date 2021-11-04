@@ -6,11 +6,11 @@ const getSearchResult = async (query, limit) => {
   // if (!keyword) const result = keyword.replace(',');
   const users = await prisma.$queryRaw`
   SELECT
-    u.first_name AS firstName,
-    u.last_name AS lastName,
-    ui.user_profile_url AS userProfileUrl
-    p.position_name currentPosition,
-    ea.content AS jobPostingContent
+    u.first_name AS userFirstName,
+    u.last_name AS userLastName,
+    ui.user_profile_url AS userProfileImageUrl,
+    p.position_name AS currentPosition,
+    c.english_name AS companyName  
   FROM
     users u
   LEFT JOIN
@@ -24,7 +24,11 @@ const getSearchResult = async (query, limit) => {
   LEFT JOIN
     positions p
   ON
-    p.id = up.position_id  
+    p.id = up.position_id
+  LEFT JOIN
+    companies c
+  ON
+    c.id = u.id     
   ${
     query.keyword
       ? Prisma.sql`WHERE u.last_name LIKE ${keyword} OR u.first_name LIKE ${keyword}`

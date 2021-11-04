@@ -19,8 +19,7 @@ const readPost = async () => {
     u.id = 1  
   `;
   const userFriendList = friendList.map((a) => a.user_id);
-  userFriendList.push(user_id);
-  console.log(friendList);
+  userFriendList.unshift(user_id);
 
   const getFriendPost = await prisma.$queryRaw`
     SELECT
@@ -36,22 +35,26 @@ const readPost = async () => {
       pc.headline AS userCurrentPosition,
       (
         SELECT
-            COUNT(c.id) AS count
+            COUNT(c.id)
           FROM
             comments c
           WHERE
             c.post_id = p.id
-        ) AS commentCount
+        ) AS commentCount,
+        (
+        SELECT
+            COUNT(pl.id)
+          FROM
+            post_likes pl
+          WHERE
+            pl.post_id = p.id
+        ) AS likeCount
       FROM
         posts p
       LEFT JOIN
         users u
       ON
         u.id = p.user_id
-      LEFT JOIN
-        comments c
-      ON
-        c.post_id = p.id
       LEFT JOIN
         user_images ui
       ON
@@ -88,6 +91,102 @@ const createPost = async (postBody) => {
   VALUES
     (${content}, ${postScopeOfPublicId}, ${commentScopeOfPublicId}, ${userId}, ${postAttachmentId})
   `;
+};
+const updatePost = async (postBody) => {
+  const { updateContent, postId } = postBody;
+  await prisma.$queryRaw`
+    UPDATE
+      posts
+    SET
+      content = ${updateContent}
+    WHERE id = ${postId}   
+    `;
+};
+
+const deletePost = async (postBody) => {
+  const { postId } = postBody;
+  await prisma.$queryRaw`
+  SET FOREIGN_KEY_CHECKS=0
+  ;`;
+  await prisma.$queryRaw`
+  DELETE FROM
+    posts p
+  WHERE
+    p.id = ${postId}
+  `;
+  await prisma.$queryRaw`SET FOREIGN_KEY_CHECKS=1`;
+};
+
+const getLikeByPost = async () => {
+  const user_id = 1;
+  const friendList = await prisma.$queryRaw`
+  SELECT
+  f.user_id
+  FROM
+  users u
+  LEFT JOIN
+  friends f
+  ON
+  f.friend_id = u.id
+  WHERE
+  f.friend_status_id = 4
+  AND
+  u.id = 1
+  `;
+  const userFriendList = friendList.map((a) => a.user_id);
+  userFriendList.unshift(user_id);
+
+  return await prisma.$queryRaw`
+  SELECT
+  p.id AS postId,
+  p.content AS postContent,
+  (
+    SELECT COUNT(pl.id)
+    FROM
+    post_likes pl
+    WHERE
+    pl.post_id = p.id
+    ) AS postLikeCount
+    FROM
+    posts p
+    LEFT JOIN
+    post_likes pl
+    ON
+    pl.post_id = p.id
+    LEFT JOIN
+    post_like_styles pls
+    ON
+    pls.id = pl.post_like_style_id
+    LEFT JOIN
+    users u
+    ON
+    u.id = pl.user_id
+    WHERE
+    p.user_id IN (${Prisma.join(userFriendList)})
+    ORDER BY p.created_at DESC
+    `;
+};
+
+const addLike = async (likeBody) => {
+  const { postLikeStyleId, userId, postId } = likeBody;
+  await prisma.$queryRaw`
+    INSERT INTO post_likes
+    (user_id, post_id, post_like_style_id)
+    VALUES
+    (${userId}, ${postId}, ${postLikeStyleId});
+    `;
+};
+
+const cancelLike = async (likeBody) => {
+  const { postId, userId } = likeBody;
+  return await prisma.$queryRaw`
+    DELETE FROM
+    post_likes
+    WHERE
+    post_id = ${postId}
+    AND
+    user_id = ${userId}
+    ;`;
 };
 
 // hashtag 추가 구현으로 미룸
@@ -140,29 +239,21 @@ const createPost = async (postBody) => {
 //   `;
 // };
 
-const updatePost = async (postBody) => {
-  const { updateContent, postId } = postBody;
-  await prisma.$queryRaw`
-    UPDATE
-      posts
-    SET
-      content = ${updateContent}
-    WHERE id = ${postId}   
-    `;
-};
-
-const deletePost = async (postBody) => {
-  const { postId } = postBody;
-  await prisma.$queryRaw`
-  DELETE FROM
-    posts
-  WHERE id = ${postId}   
-  `;
-};
+// const getLikeByPost = async () => {
+//   return await prisma.$queryRaw`
+//     SELECT COUNT(post_likes_id)
+//       FROM
+//     comment_likes
+//       WHERE post_id
+//   `;
+// };
 
 export default {
   readPost,
   createPost,
   updatePost,
   deletePost,
+  getLikeByPost,
+  addLike,
+  cancelLike,
 };
