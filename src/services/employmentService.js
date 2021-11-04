@@ -1,16 +1,23 @@
 import { employmentDao } from '../models';
 
-const getJobPostingList = async () => {
-  const jobPostingList = await employmentDao.getJobPostingList();
+const getJobListBySearch = async (query) => {
+  const jobPostingBySearch = await employmentDao.getJobListBySearch(query);
+  return jobPostingBySearch;
+};
+const getJobPostingList = async (filterWord) => {
+  const jobPostingList = await employmentDao.getJobPostingList(filterWord);
   return jobPostingList;
 };
 
-const getJobPostingDetail = async () => {
-  const jobPostingDetail = await employmentDao.getJobPostingDetail();
+const getJobPostingDetail = async (jobPostingId) => {
+  const jobPostingDetail = await employmentDao.getJobPostingDetail(
+    jobPostingId
+  );
   return jobPostingDetail;
 };
 
 export default {
+  getJobListBySearch,
   getJobPostingList,
   getJobPostingDetail,
 };
