@@ -5,6 +5,7 @@ import companyRoute from './companyRouter';
 import searchRoute from './searchRouter';
 import postRoute from './postRouter';
 import commentRoute from './commentRouter';
+import friendRoute from './friendRouter';
 
 const router = express.Router();
 
@@ -14,5 +15,6 @@ router.use('/company', companyRoute);
 router.use('/search', searchRoute);
 router.use('/post', postRoute);
 router.use('/comment', commentRoute);
+router.use('/friend', friendRoute);
 
 export default router;
