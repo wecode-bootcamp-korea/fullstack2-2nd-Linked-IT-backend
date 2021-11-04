@@ -495,10 +495,12 @@ model PostAttachment {
 model PostLike {
   id Int @id @default(autoincrement())
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int  @map("user_id")
-  post   Post @relation(fields: [postId], references: [id])
-  postId Int  @map("post_id")
+  postLikeStyle   PostLikeStyle @relation(fields: [postLikeStyleId], references: [id])
+  postLikeStyleId Int           @unique @map("post_like_style_id")
+  user            User          @relation(fields: [userId], references: [id])
+  userId          Int           @map("user_id")
+  post            Post          @relation(fields: [postId], references: [id])
+  postId          Int           @map("post_id")
 
   PostLikeStyle   PostLikeStyle @relation(fields: [postLikeStyleId], references: [id])
   postLikeStyleId Int           @map("post_like_style_id")
@@ -510,7 +512,6 @@ model PostLike {
 model PostLikeStyle {
   id   Int    @id @default(autoincrement())
   type String @db.VarChar(100)
-
 
   PostLike PostLike[]
   @@map("post_like_styles")
