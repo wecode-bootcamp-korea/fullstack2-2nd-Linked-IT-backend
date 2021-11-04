@@ -10,6 +10,16 @@ const getUser = async (req, res) => {
   }
 };
 
+const getUserListBySearch = async (req, res) => {
+  try {
+    const query = req.query;
+    const userListBySearch = await userService.getUserListBySearch(query);
+    res.status(200).send(userListBySearch);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 const getEducation = async (req, res) => {
   try {
     const userId = req.params.userid;
@@ -168,6 +178,16 @@ const deleteInstantMessenger = async (req, res) => {
   }
 };
 
+const getAllUserListByClick = async (req, res) => {
+  try {
+    const query = req.query;
+    const userAllList = await userService.getAllUserListByClick(query);
+    res.status(200).send(userAllList);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 export default {
   getUser,
   getEducation,
@@ -184,4 +204,6 @@ export default {
   deleteWebsite,
   createInstantMessenger,
   deleteInstantMessenger,
+  getUserListBySearch,
+  getAllUserListByClick,
 };

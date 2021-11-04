@@ -6,16 +6,14 @@ import routes from './src/routes';
 
 const app = express();
 
-app.use(morgan('dev'));
+// app.use(morgan('dev'));
 
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 app.use(routes);
 
-app.get('/ping', (req, res) => {
-  res.json('pong');
-});
+app.use(routes);
 
 app.use((req, res, next) => {
   next(new Error(`NOT_FOUND_${req.originalUrl}`));
@@ -25,7 +23,7 @@ app.use((err, req, res, next) => {
   if (err) {
     console.error('global error handler', err);
     const { status, message } = err;
-    res.send(status || 500).json(message);
+    res.status(status || 500).json(message);
   }
 });
 

@@ -25,4 +25,6 @@ router.delete(
   userController.deleteInstantMessenger
 );
 
+router.get('/', userController.getUserListBySearch);
+
 export default router;

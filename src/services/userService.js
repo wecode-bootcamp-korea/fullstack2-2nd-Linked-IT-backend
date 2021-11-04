@@ -140,6 +140,16 @@ const deleteInstantMessenger = async (userId, instantMessengerId) => {
   return await userDao.deleteInstantMessenger(userId, instantMessengerId);
 };
 
+const getUserListBySearch = async (query) => {
+  const userListBySearch = await userDao.getUserListBySearch(query);
+  return userListBySearch;
+};
+
+const getAllUserListByClick = async (query, limit, offset) => {
+  const userAllList = await userDao.getAllUserListByClick(query, limit, offset);
+  return userAllList;
+};
+
 export default {
   getUser,
   getEducation,
@@ -156,4 +166,6 @@ export default {
   deleteWebsite,
   createInstantMessenger,
   deleteInstantMessenger,
+  getUserListBySearch,
+  getAllUserListByClick,
 };
