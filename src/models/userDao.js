@@ -69,18 +69,19 @@ const getUser = async (userId) => {
 
 const getEducation = async (userId) => {
   return await prisma.$queryRaw`
-    SELECT  u.id                userId
-          , u.first_name         firstName
-          , u.last_name         lastName
-          , c.college_name      schoolName
-          , c.location          schoolLocation
-          , d.type              degree
-          , m.major_name        major
-          , e.grade             gpa
-          , e.admission_month   admissionMonth
-          , e.admission_year    admissionYear
-          , e.graduation_month  graduationMonth
-          , e.graduation_year   graduationYear
+    SELECT  u.id                  userId
+          , u.first_name           firstName
+          , u.last_name           lastName
+          , ci.college_image_url  schoolLogo
+          , c.college_name        schoolName
+          , c.location            schoolLocation
+          , d.type                degree
+          , m.major_name          major
+          , e.grade               gpa
+          , e.admission_month     admissionMonth
+          , e.admission_year      admissionYear
+          , e.graduation_month    graduationMonth
+          , e.graduation_year     graduationYear
           , e.activity
           , e.description
       FROM  users u
@@ -92,6 +93,8 @@ const getEducation = async (userId) => {
         ON  e.degree_id = d.id
  LEFT JOIN  majors m
         ON  e.major_id = m.id
+ LEFT JOIN  college_images ci
+        ON  ci.college_id = c.id
      WHERE  u.id = ${userId}
     ;
   `;
