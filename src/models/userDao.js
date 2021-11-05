@@ -445,24 +445,23 @@ const deleteInstantMessenger = async (userId, instantMessengerId) => {
 };
 
 const getUserListBySearch = async (query, limit) => {
-  console.log(query.limit);
   const keyword = `%${query.keyword}%`;
   const users = await prisma.$queryRaw`
   SELECT
-    u.first_name AS userFirstName,
-    u.last_name AS userLastName,
-    ui.user_profile_url AS userProfileImageUrl,
-    pc.headline AS userCurrentPosition,
-    p.position_name AS userPriorPosition,
+    u.first_name AS firstName,
+    u.last_name AS lastName,
+    ui.user_profile_url AS userProfileUrl,
+    pc.headline AS headline,
+    p.position_name AS currentPosition,
     c.location AS companyLocation,
-      (
+          (
         SELECT
           COUNT(u.id) AS count
         FROM
           users u
         ${
           query.keyword
-            ? Prisma.sql`WHERE pc.headline LIKE ${keyword} OR u.last_name LIKE ${keyword} OR u.first_name LIKE ${keyword}`
+            ? Prisma.sql`WHERE u.last_name LIKE ${keyword} OR u.first_name LIKE ${keyword}`
             : Prisma.empty
         }
       ) AS userCount
@@ -490,11 +489,11 @@ const getUserListBySearch = async (query, limit) => {
     c.id = u.id  
   ${
     query.keyword
-      ? Prisma.sql`WHERE u.last_name LIKE ${keyword} OR u.first_name LIKE ${keyword} OR pc.headline LIKE ${keyword}`
+      ? Prisma.sql`WHERE u.last_name LIKE ${keyword} OR u.first_name LIKE ${keyword}`
       : Prisma.empty
   }
   ${query.limit ? Prisma.sql`LIMIT ${query.limit}` : Prisma.empty}
-  `;
+  ;`;
   return users;
 };
 
