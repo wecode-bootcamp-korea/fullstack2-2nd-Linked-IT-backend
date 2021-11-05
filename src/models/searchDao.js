@@ -6,9 +6,9 @@ const getSearchResult = async (query, limit) => {
   // if (!keyword) const result = keyword.replace(',');
   const users = await prisma.$queryRaw`
   SELECT
-    u.first_name AS userFirstName,
-    u.last_name AS userLastName,
-    ui.user_profile_url AS userProfileImageUrl,
+    u.first_name AS firstName,
+    u.last_name AS lastName,
+    ui.user_profile_url AS userProfileUrl,
     p.position_name AS currentPosition,
     c.english_name AS companyName  
   FROM
@@ -35,6 +35,7 @@ const getSearchResult = async (query, limit) => {
       : Prisma.empty
   }
   ORDER BY u.id DESC
+  LIMIT 5
   ;`;
 
   const companies = await prisma.$queryRaw`
@@ -55,6 +56,7 @@ const getSearchResult = async (query, limit) => {
         : Prisma.empty
     }
     ORDER BY c.id DESC
+    LIMIT 5
     ;`;
   const result = [...users, ...companies];
   return result;

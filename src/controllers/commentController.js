@@ -41,7 +41,7 @@ const updateCommentOfPost = async (req, res) => {
     const updatedComment = await commentService.updateCommentOfPost(
       commentBody
     );
-    res.status(200).send(updatedComment);
+    res.status(200).send(commentBody);
   } catch (err) {
     console.log(err);
   }
@@ -61,7 +61,7 @@ const deleteCommentOfPost = async (req, res) => {
 
 const getLikeByComment = async (req, res) => {
   try {
-    const sumOfLike = await commentService.getLikeByComment();
+    const sumOfLike = await commentService.getLikeByPost();
     res.status(200).send(sumOfLike);
   } catch (err) {
     console.log(err);
@@ -78,16 +78,6 @@ const addLike = async (req, res) => {
   }
 };
 
-const cancelLike = async (req, res) => {
-  try {
-    const likeBody = req.body;
-    const cancelLike = await commentService.cancelLike(likeBody);
-    res.status(200).send(cancelLike);
-  } catch (err) {
-    console.log(err);
-  }
-};
-
 export default {
   createCommentOfPost,
   getCommentOfPost,
@@ -96,5 +86,4 @@ export default {
   // createSubCommentOfPost,
   getLikeByComment,
   addLike,
-  cancelLike,
 };

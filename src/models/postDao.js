@@ -32,7 +32,9 @@ const readPost = async () => {
       u.first_name AS firstName,
       u.last_name AS lastName,
       ui.user_profile_url AS userProfileUrl,
-      pc.headline AS userCurrentPosition,
+      pc.headline AS currentPosition,
+      c.english_name AS companyNameEng,
+      pa.image_url AS image,
       (
         SELECT
             COUNT(c.id)
@@ -70,7 +72,15 @@ const readPost = async () => {
       LEFT JOIN
         position_careers pc
       ON
-        pc.user_id = u.id       
+        pc.user_id = u.id
+      LEFT JOIN
+        post_attachments pa
+      ON
+        pa.id = p.post_attachment_id
+      LEFT JOIN
+        companies c
+      ON
+        c.id = pc.company_id
     WHERE p.user_id IN (${Prisma.join(userFriendList)})
     ORDER BY p.created_at DESC
     ;`;
@@ -92,6 +102,7 @@ const createPost = async (postBody) => {
     (${content}, ${postScopeOfPublicId}, ${commentScopeOfPublicId}, ${userId}, ${postAttachmentId})
   `;
 };
+
 const updatePost = async (postBody) => {
   const { updateContent, postId } = postBody;
   await prisma.$queryRaw`
