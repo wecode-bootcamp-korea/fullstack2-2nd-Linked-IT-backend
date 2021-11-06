@@ -2,7 +2,8 @@ import { postService } from '../services';
 
 const readPost = async (req, res) => {
   try {
-    const posts = await postService.readPost();
+    const { offset, limit } = req.query;
+    const posts = await postService.readPost(offset, limit);
     res.status(200).send(posts);
   } catch (err) {
     console.log(err);
