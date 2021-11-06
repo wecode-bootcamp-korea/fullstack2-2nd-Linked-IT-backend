@@ -1,7 +1,7 @@
 import { postDao } from '../models';
 
-const readPost = async () => {
-  const post = await postDao.readPost();
+const readPost = async (offset, limit) => {
+  const post = await postDao.readPost(offset, limit);
   return post;
 };
 

@@ -1,9 +1,9 @@
 import { Prisma } from '.prisma/client';
 import prisma from '../../prisma';
 
-const readPost = async () => {
+const readPost = async (offset, limit) => {
   const user_id = 1;
-
+  console.log(offset, limit);
   const friendList = await prisma.$queryRaw`
   SELECT
     f.user_id
@@ -73,6 +73,8 @@ const readPost = async () => {
         pc.user_id = u.id       
     WHERE p.user_id IN (${Prisma.join(userFriendList)})
     ORDER BY p.created_at DESC
+    LIMIT ${limit}
+    OFFSET ${offset}
     ;`;
   return getFriendPost;
 };
