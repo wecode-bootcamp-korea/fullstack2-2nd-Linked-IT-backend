@@ -153,9 +153,21 @@ const updateIntro = async (userId, userData) => {
     anotherName,
     oneLineProfile,
     headline,
-    industryId,
-    countryId,
+    industry,
+    country,
   } = userData;
+  const DBindustries = await prisma.$queryRaw`
+    SELECT  *
+      FROM  industries
+    WHERE  industries.industry_type LIKE ${industry}
+`;
+  if (!DBindustries.length) {
+    await prisma.$queryRaw`
+      INSERT INTO 
+      industries (industry_type)
+          VALUES (${industry})
+`;
+  }
   return await prisma.$queryRaw`
       UPDATE 	users u
   INNER JOIN  introductions intro
@@ -171,8 +183,12 @@ const updateIntro = async (userId, userData) => {
             ,	intro.another_name		 = ${anotherName}
             ,	intro.one_line_profile	=	${oneLineProfile}
             ,	pc.headline				     = ${headline}
-            ,	pc.industry_id			   = ${industryId}
-            ,	intro.country_id		   = ${countryId}
+            ,	pc.industry_id			   = (SELECT  id
+                                          FROM  industries
+                                         WHERE  industry_type LIKE ${industry})
+            ,	intro.country_id		   = (SELECT  id
+                                          FROM  countries
+                                         WHERE  country_name LIKE ${country})
 	    WHERE	  u.id = ${userId}
       ;
   `;
