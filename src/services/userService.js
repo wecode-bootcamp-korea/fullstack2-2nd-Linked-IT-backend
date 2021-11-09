@@ -40,8 +40,8 @@ const deletePositionCareer = async (userId, positionCareerId) => {
   return await userDao.deletePositionCareer(userId, positionCareerId);
 };
 
-const getCollegeSelect = async () => {
-  return await userDao.getCollegeSelect();
+const getCollegeSelect = async (college) => {
+  return await userDao.getCollegeSelect(college);
 };
 
 const createEducation = async (userId, educationData) => {
@@ -91,6 +91,7 @@ export default {
   createPositionCareer,
   updatePositionCareer,
   deletePositionCareer,
+  getCollegeSelect,
   createEducation,
   updateEducation,
   deleteEducation,
@@ -100,5 +101,4 @@ export default {
   deleteInstantMessenger,
   getUserListBySearch,
   getAllUserListByClick,
-  getCollegeSelect,
 };

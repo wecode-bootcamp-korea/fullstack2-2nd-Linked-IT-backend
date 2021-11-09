@@ -102,8 +102,9 @@ const deletePositionCareer = async (req, res) => {
 
 const getCollegeSelect = async (req, res) => {
   try {
-    await userService.getCollegeSelect();
-    res.status(200).json({ message: 'SUCCESS' });
+    const college = req.body.college;
+    const colleges = await userService.getCollegeSelect(college);
+    res.status(200).json(colleges);
   } catch (err) {
     console.log(err);
   }
@@ -206,6 +207,7 @@ export default {
   createPositionCareer,
   updatePositionCareer,
   deletePositionCareer,
+  getCollegeSelect,
   createEducation,
   updateEducation,
   deleteEducation,
@@ -215,5 +217,4 @@ export default {
   deleteInstantMessenger,
   getUserListBySearch,
   getAllUserListByClick,
-  getCollegeSelect,
 };

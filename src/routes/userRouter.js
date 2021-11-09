@@ -3,6 +3,7 @@ import { userController } from '../controllers';
 
 const router = express.Router();
 
+router.get('/college', userController.getCollegeSelect);
 router.get('/:userid', userController.getUser);
 router.get('/:userid/education', userController.getEducation);
 router.get('/:userid/career', userController.getPositionCareer);
@@ -11,7 +12,6 @@ router.patch('/:userid/contact', userController.updateContact);
 router.post('/:userid/career', userController.createPositionCareer);
 router.patch('/:userid/career/:careerid', userController.updatePositionCareer);
 router.delete('/:userid/career/:careerid', userController.deletePositionCareer);
-router.get('/college', userController.getCollegeSelect);
 router.post('/:userid/education', userController.createEducation);
 router.patch('/:userid/education/:educationid', userController.updateEducation);
 router.delete(

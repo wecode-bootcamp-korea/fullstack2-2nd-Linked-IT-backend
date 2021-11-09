@@ -351,10 +351,12 @@ const deletePositionCareer = async (userId, positionCareerId) => {
   `;
 };
 
-const getCollegeSelect = async () => {
+const getCollegeSelect = async (college) => {
   return await prisma.$queryRaw`
-    SELECT  colleges.college_name
+    SELECT  id AS collegeId
+          , college_name
       FROM  colleges
+     WHERE  college_name LIKE concat(${college},"%")
   `;
 };
 
@@ -594,6 +596,7 @@ export default {
   createPositionCareer,
   updatePositionCareer,
   deletePositionCareer,
+  getCollegeSelect,
   createEducation,
   updateEducation,
   deleteEducation,
@@ -601,5 +604,4 @@ export default {
   deleteWebsite,
   createInstantMessenger,
   deleteInstantMessenger,
-  getCollegeSelect,
 };
