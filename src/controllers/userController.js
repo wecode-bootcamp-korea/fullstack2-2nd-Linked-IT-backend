@@ -100,6 +100,15 @@ const deletePositionCareer = async (req, res) => {
   }
 };
 
+const getCollegeSelect = async (req, res) => {
+  try {
+    await userService.getCollegeSelect();
+    res.status(200).json({ message: 'SUCCESS' });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 const createEducation = async (req, res) => {
   try {
     const userId = req.params.userid;
@@ -206,4 +215,5 @@ export default {
   deleteInstantMessenger,
   getUserListBySearch,
   getAllUserListByClick,
+  getCollegeSelect,
 };
