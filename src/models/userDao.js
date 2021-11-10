@@ -468,14 +468,14 @@ const updateEducation = async (userId, educationId, educationData) => {
           , grade               = ${grade}
           , activity            = ${activity}
           , description         = ${description}
-          , (SELECT colleges.id
-               FROM colleges
-              WHERE colleges.college_name LIKE ${college})
-          , ${degreeId}
-          , (SELECT majors.id
-               FROM majors
-              WHERE majors.major_name LIKE ${major})
-          , ${userId}
+          , college_id          = (SELECT id
+                                     FROM colleges
+                                    WHERE college_name LIKE ${college})
+          , degree_id           = ${degreeId}
+          , major_id            =(SELECT id
+                                    FROM majors
+                                   WHERE major_name LIKE ${major})
+          , user_id             = ${userId}
           , scope_of_public_id  = ${scopeOfPublicId}
     WHERE  educations.user_id = ${userId}
       AND  educations.id      = ${educationId}

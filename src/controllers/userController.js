@@ -6,7 +6,7 @@ const getUser = async (req, res) => {
     const getUser = await userService.getUser(userId);
     res.status(200).json(getUser);
   } catch (err) {
-    console.log(err);
+    res.status(404).send(err);
   }
 };
 
@@ -26,7 +26,7 @@ const getEducation = async (req, res) => {
     const getEducation = await userService.getEducation(userId);
     res.status(200).json(getEducation);
   } catch (err) {
-    console.log(err);
+    res.status(404).send(err);
   }
 };
 
@@ -36,7 +36,7 @@ const getPositionCareer = async (req, res) => {
     const getPositionCareer = await userService.getPositionCareer(userId);
     res.status(200).json(getPositionCareer);
   } catch (err) {
-    console.log(err);
+    res.status(404).send(err);
   }
 };
 
@@ -47,7 +47,7 @@ const updateIntro = async (req, res) => {
     await userService.updateIntro(userId, userData);
     res.status(200).json({ message: 'UPDATE SUCCESS' });
   } catch (err) {
-    console.log(err);
+    res.status(404).send(err);
   }
 };
 
@@ -58,7 +58,7 @@ const updateContact = async (req, res) => {
     await userService.updateContact(userId, userData);
     res.status(200).json({ message: 'UPDATE SUCCESS' });
   } catch (err) {
-    console.log(err);
+    res.status(404).send(err);
   }
 };
 
@@ -69,7 +69,7 @@ const createPositionCareer = async (req, res) => {
     await userService.createPositionCareer(userId, positionCareerData);
     res.status(200).json({ messege: 'CREATE SUCCESS' });
   } catch (err) {
-    console.log(err);
+    res.status(404).send(err);
   }
 };
 
@@ -85,7 +85,7 @@ const updatePositionCareer = async (req, res) => {
     );
     res.status(200).json({ messege: 'UPDATE SUCCESS' });
   } catch (err) {
-    console.log(err);
+    res.status(404).send(err);
   }
 };
 
@@ -96,7 +96,7 @@ const deletePositionCareer = async (req, res) => {
     await userService.deletePositionCareer(userId, positionCareerId);
     res.status(200).json({ messege: 'DELETE SUCCESS' });
   } catch (err) {
-    console.log(err);
+    res.status(404).send(err);
   }
 };
 
@@ -106,7 +106,7 @@ const getCollegeSelect = async (req, res) => {
     const colleges = await userService.getCollegeSelect(college);
     res.status(200).json(colleges);
   } catch (err) {
-    console.log(err);
+    res.status(404).send(err);
   }
 };
 
@@ -117,7 +117,7 @@ const createEducation = async (req, res) => {
     await userService.createEducation(userId, educationData);
     res.status(200).json({ messege: 'CREATE SUCCESS' });
   } catch (err) {
-    console.log(err);
+    res.status(404).send(err);
   }
 };
 
@@ -129,7 +129,7 @@ const updateEducation = async (req, res) => {
     await userService.updateEducation(userId, educationId, educationData);
     res.status(200).json({ message: 'UPDATE SUCCESS' });
   } catch (err) {
-    console.log(err);
+    res.status(404).send(err);
   }
 };
 
@@ -140,7 +140,7 @@ const deleteEducation = async (req, res) => {
     await userService.deleteEducation(userId, educationId);
     res.status(200).json({ message: 'DELETE SUCCESS' });
   } catch (err) {
-    console.log(err);
+    res.status(404).send(err);
   }
 };
 
@@ -151,7 +151,7 @@ const createWebsite = async (req, res) => {
     await userService.createWebsite(userId, websiteData);
     res.status(200).json({ message: 'CREATE SUCCESS' });
   } catch (err) {
-    console.log(err);
+    res.status(404).send(err);
   }
 };
 
@@ -162,7 +162,7 @@ const deleteWebsite = async (req, res) => {
     await userService.deleteWebsite(userId, websiteId);
     res.status(200).json({ message: 'DELETE SUCCESS' });
   } catch (err) {
-    console.log(err);
+    res.status(404).send(err);
   }
 };
 
@@ -173,7 +173,7 @@ const createInstantMessenger = async (req, res) => {
     await userService.createInstantMessenger(userId, instantMessengerData);
     res.status(200).json({ message: 'CREATE SUCCESS' });
   } catch (err) {
-    console.log(err);
+    res.status(404).send(err);
   }
 };
 
@@ -184,7 +184,7 @@ const deleteInstantMessenger = async (req, res) => {
     await userService.deleteInstantMessenger(userId, instantMessengerId);
     res.status(200).json({ message: 'DELETE SUCCESS' });
   } catch (err) {
-    console.log(err);
+    res.status(404).send(err);
   }
 };
 
@@ -194,7 +194,7 @@ const getAllUserListByClick = async (req, res) => {
     const userAllList = await userService.getAllUserListByClick(query);
     res.status(200).send(userAllList);
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 };
 
