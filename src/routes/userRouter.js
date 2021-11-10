@@ -3,6 +3,7 @@ import { userController } from '../controllers';
 
 const router = express.Router();
 
+router.get('/college', userController.getCollegeSelect);
 router.get('/:userid', userController.getUser);
 router.get('/:userid/education', userController.getEducation);
 router.get('/:userid/career', userController.getPositionCareer);

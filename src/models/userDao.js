@@ -153,9 +153,21 @@ const updateIntro = async (userId, userData) => {
     anotherName,
     oneLineProfile,
     headline,
-    industryId,
-    countryId,
+    industry,
+    country,
   } = userData;
+  const DBindustries = await prisma.$queryRaw`
+    SELECT  *
+      FROM  industries
+    WHERE  industries.industry_type LIKE ${industry}
+`;
+  if (!DBindustries.length) {
+    await prisma.$queryRaw`
+      INSERT INTO 
+      industries (industry_type)
+          VALUES (${industry})
+`;
+  }
   return await prisma.$queryRaw`
       UPDATE 	users u
   INNER JOIN  introductions intro
@@ -171,8 +183,12 @@ const updateIntro = async (userId, userData) => {
             ,	intro.another_name		 = ${anotherName}
             ,	intro.one_line_profile	=	${oneLineProfile}
             ,	pc.headline				     = ${headline}
-            ,	pc.industry_id			   = ${industryId}
-            ,	intro.country_id		   = ${countryId}
+            ,	pc.industry_id			   = (SELECT  id
+                                          FROM  industries
+                                         WHERE  industry_type LIKE ${industry})
+            ,	intro.country_id		   = (SELECT  id
+                                          FROM  countries
+                                         WHERE  country_name LIKE ${country})
 	    WHERE	  u.id = ${userId}
       ;
   `;
@@ -208,16 +224,30 @@ const createPositionCareer = async (userId, positionCareerData) => {
     employmentTypeId,
     scopeOfPublicId,
   } = positionCareerData;
-  await prisma.$queryRaw`
+  const DBpositions = await prisma.$queryRaw`
+    SELECT  *
+      FROM  positions
+     WHERE  positions.position_name LIKE ${position}
+  `;
+  const DBindustries = await prisma.$queryRaw`
+    SELECT  *
+      FROM  industries
+     WHERE  industries.industry_type LIKE ${industry}
+  `;
+  if (!DBpositions.length) {
+    await prisma.$queryRaw`
     INSERT INTO 
       positions (position_name)
          VALUES (${position})
   `;
-  await prisma.$queryRaw`
+  }
+  if (!DBindustries.length) {
+    await prisma.$queryRaw`
     INSERT INTO 
      industries (industry_type)
          VALUES (${industry})
   `;
+  }
   return await prisma.$queryRaw`
     INSERT INTO position_careers (is_current_position
                                 , is_end_current_position
@@ -269,12 +299,36 @@ const updatePositionCareer = async (
     endMonth,
     endYear,
     description,
-    positionId,
+    position,
     companyName,
     industry,
     employmentTypeId,
     scopeOfPublicId,
   } = positionCareerData;
+  const DBpositions = await prisma.$queryRaw`
+    SELECT  *
+      FROM  positions
+     WHERE  positions.position_name LIKE ${position}
+  `;
+  const DBindustries = await prisma.$queryRaw`
+    SELECT  *
+      FROM  industries
+     WHERE  industries.industry_type LIKE ${industry}
+  `;
+  if (!DBpositions.length) {
+    await prisma.$queryRaw`
+    INSERT INTO 
+      positions (position_name)
+         VALUES (${position})
+  `;
+  }
+  if (!DBindustries.length) {
+    await prisma.$queryRaw`
+    INSERT INTO 
+     industries (industry_type)
+         VALUES (${industry})
+  `;
+  }
   return await prisma.$queryRaw` 
   UPDATE  position_careers
      SET    is_current_position     = ${isCurrentPosition}
@@ -284,14 +338,15 @@ const updatePositionCareer = async (
           , end_month               = ${endMonth}
           , end_year                = ${endYear}
           , description             = ${description}
-          , position_id             = ${positionId}
+          , position_id             = (SELECT positions.id
+                                         FROM positions
+                                        WHERE positions.position_name LIKE ${position})
           , company_id              = (SELECT companies.id
                                          FROM companies
                                         WHERE companies.korean_name LIKE ${companyName})
           , industry_id             = (SELECT industries.id
                                          FROM industries
                                         WHERE industries.industry_type LIKE ${industry})
-          , user_id                 = ${userId}
           , employment_type_id      = ${employmentTypeId}
           , scope_of_public_id      = ${scopeOfPublicId}
    WHERE  position_careers.user_id = ${userId}
@@ -300,10 +355,24 @@ const updatePositionCareer = async (
 };
 
 const deletePositionCareer = async (userId, positionCareerId) => {
+  await prisma.$queryRaw`
+    DELETE FROM introductions
+          WHERE introductions.user_id = ${userId}
+            AND introductions.position_career_id = ${positionCareerId}
+  `;
   return await prisma.$queryRaw`
     DELETE FROM position_careers
           WHERE position_careers.user_id = ${userId}
             AND position_careers.id      = ${positionCareerId}
+  `;
+};
+
+const getCollegeSelect = async (college) => {
+  return await prisma.$queryRaw`
+    SELECT  id AS collegeId
+          , college_name
+      FROM  colleges
+     WHERE  college_name LIKE concat(${college},"%")
   `;
 };
 
@@ -316,11 +385,22 @@ const createEducation = async (userId, educationData) => {
     grade,
     activity,
     description,
-    collegeId,
+    college,
     degreeId,
-    majorId,
+    major,
     scopeOfPublicId,
   } = educationData;
+  const DBmajors = await prisma.$queryRaw`
+    SELECT  *
+      FROM  majors
+     WHERE  majors.major_name LIKE ${major}
+  `;
+  if (!DBmajors.length) {
+    await prisma.$queryRaw`
+    INSERT INTO majors (major_name)
+         VALUES (${major})
+    `;
+  }
   return await prisma.$queryRaw`
     INSERT INTO educations (admission_month
                           , admission_year
@@ -341,9 +421,13 @@ const createEducation = async (userId, educationData) => {
                           , ${grade}
                           , ${activity}
                           , ${description}
-                          , ${collegeId}
+                          , (SELECT colleges.id
+                               FROM colleges
+                              WHERE colleges.college_name LIKE ${college})
                           , ${degreeId}
-                          , ${majorId}
+                          , (SELECT majors.id
+                               FROM majors
+                              WHERE majors.major_name LIKE ${major})
                           , ${userId}
                           , ${scopeOfPublicId})
     ;                        
@@ -359,11 +443,22 @@ const updateEducation = async (userId, educationId, educationData) => {
     grade,
     activity,
     description,
-    collegeId,
+    college,
     degreeId,
-    majorId,
+    major,
     scopeOfPublicId,
   } = educationData;
+  const DBmajors = await prisma.$queryRaw`
+  SELECT  *
+    FROM  majors
+   WHERE  majors.major_name LIKE ${major}
+  `;
+  if (!DBmajors.length) {
+    await prisma.$queryRaw`
+  INSERT INTO majors (major_name)
+       VALUES (${major})
+  `;
+  }
   return await prisma.$queryRaw`
     UPDATE  educations
        SET  admission_month     = ${admissionMonth}
@@ -373,9 +468,14 @@ const updateEducation = async (userId, educationId, educationData) => {
           , grade               = ${grade}
           , activity            = ${activity}
           , description         = ${description}
-          , college_id          = ${collegeId}
+          , college_id          = (SELECT id
+                                     FROM colleges
+                                    WHERE college_name LIKE ${college})
           , degree_id           = ${degreeId}
-          , major_id            = ${majorId}
+          , major_id            =(SELECT id
+                                    FROM majors
+                                   WHERE major_name LIKE ${major})
+          , user_id             = ${userId}
           , scope_of_public_id  = ${scopeOfPublicId}
     WHERE  educations.user_id = ${userId}
       AND  educations.id      = ${educationId}
@@ -512,6 +612,7 @@ export default {
   createPositionCareer,
   updatePositionCareer,
   deletePositionCareer,
+  getCollegeSelect,
   createEducation,
   updateEducation,
   deleteEducation,
